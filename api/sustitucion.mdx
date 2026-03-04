@@ -5,6 +5,35 @@ description: Caesar cipher implementation for encrypting and decrypting messages
 
 The `sustitucion` module implements a Caesar cipher algorithm that shifts letters in the Spanish alphabet (including Ñ) by a specified position.
 
+## Module constants
+
+### abecedario
+
+A dictionary mapping Spanish alphabet letters (A-Z, including Ñ) to their numeric positions.
+
+```python
+abecedario = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5, 'G': 6, 'H': 7, 
+              'I': 8, 'J': 9, 'K': 10, 'L': 11, 'M': 12, 'N': 13, 'Ñ': 14, 
+              'O': 15, 'P': 16, 'Q': 17, 'R': 18, 'S': 19, 'T': 20, 'U': 21, 
+              'V': 22, 'W': 23, 'X': 24, 'Y': 25, 'Z': 26}
+```
+
+**Type**: `dict[str, int]`
+
+### abecedario_inverso
+
+A reverse mapping dictionary that converts numeric positions back to letters. Generated automatically from `abecedario`.
+
+```python
+abecedario_inverso = {0: 'A', 1: 'B', 2: 'C', ..., 26: 'Z'}
+```
+
+**Type**: `dict[int, str]`
+
+<Note>
+These dictionaries are used internally by the conversion functions but can be accessed directly if needed for custom operations.
+</Note>
+
 ## convertiraNumero
 
 Converts a message string into a list of numeric values based on the Spanish alphabet.
