@@ -1,0 +1,88 @@
+{
+  "projectType": "general",
+  "projectName": "Algoritmos de Encriptamiento",
+  "projectDescription": "Educational Python cryptography tool implementing Caesar cipher, Transposition cipher, and RSA encryption with Flask web interface and CLI.",
+  "theme": "aspen",
+  "primaryColor": "#667eea",
+  "lightColor": "#764ba2",
+  "darkColor": "#f093fb",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Algorithms",
+            "pages": [
+              "algorithms/overview",
+              "algorithms/caesar",
+              "algorithms/transposition",
+              "algorithms/rsa"
+            ]
+          },
+          {
+            "group": "Usage Guides",
+            "pages": [
+              "guides/web-interface",
+              "guides/cli-usage",
+              "guides/examples"
+            ]
+          },
+          {
+            "group": "Additional",
+            "pages": [
+              "security-notes",
+              "contributing",
+              "faq"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Modules",
+            "pages": [
+              "api/sustitucion",
+              "api/transposicion",
+              "api/rsa",
+              "api/util"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Three classic encryption algorithms: Caesar, Transposition, and RSA",
+    "Intuitive Flask web interface for interactive encryption/decryption",
+    "Command-line interface for direct execution",
+    "Automatic RSA key generation with configurable bit length",
+    "Spanish alphabet support including Ñ character",
+    "Educational focus with clear code examples"
+  ],
+  "publicApiSurface": [
+    "sustitucion.convertiraNumero(mensaje)",
+    "sustitucion.cifrar(cifrado, pos)",
+    "sustitucion.descifrar(cifrado, pos)",
+    "sustitucion.convertiraLetra(cifrado)",
+    "transposicion.cifrar(mensaje, clave)",
+    "transposicion.descifrar(mensaje_cifrado, clave)",
+    "RSA.gen_keys(bits)",
+    "RSA.encrypt(msg, e, n)",
+    "RSA.decrypt(cipher, d, n)",
+    "RSA.gen_prime(bits)",
+    "RSA.is_prime(n)",
+    "RSA.gcd(a, b)",
+    "RSA.mod_inverse(a, m)"
+  ]
+}
