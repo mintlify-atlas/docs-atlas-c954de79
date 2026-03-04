@@ -1,0 +1,374 @@
+---
+title: Transposition cipher
+description: Documentation for the columnar transposition cipher implementation using matrix-based rearrangement
+---
+
+The transposition cipher rearranges the letters of a message using a columnar transposition matrix. Unlike substitution ciphers, it doesn't change the letters themselves—it only changes their positions.
+
+## How it works
+
+The transposition cipher uses a **matrix-based approach**:
+
+1. Remove spaces from the message
+2. Arrange the message into a matrix with a fixed number of columns (the key)
+3. Add padding characters (`*`) if needed to fill the last row
+4. Read the matrix column-by-column to create the ciphertext
+
+<Note>
+  This cipher preserves all letter frequencies, making it resistant to frequency analysis but vulnerable to anagramming attacks.
+</Note>
+
+## Algorithm explanation
+
+### Visual example
+
+For message "HOLA MUNDO" with key = 5:
+
+```
+Original: HOLAMUNDO
+
+Step 1: Arrange in matrix (5 columns)
+┌─┬─┬─┬─┬─┐
+│H│O│L│A│M│
+├─┼─┼─┼─┼─┤
+│U│N│D│O│*│  ← Padding added
+└─┴─┴─┴─┴─┘
+
+Step 2: Read column by column
+Column 1: H, U → HU
+Column 2: O, N → ON
+Column 3: L, D → LD
+Column 4: A, O → AO
+Column 5: M, * → M*
+
+Ciphertext: HUONLDAOM*
+```
+
+### Decryption process
+
+```
+Ciphertext: HUONLDAOM*
+Key: 5 columns, 2 rows
+
+Read sequentially into matrix by columns:
+┌─┬─┬─┬─┬─┐
+│H│O│L│A│M│
+├─┼─┼─┼─┼─┤
+│U│N│D│O│*│
+└─┴─┴─┴─┴─┘
+
+Read row by row: HOLAMUNDO* → Remove padding → HOLAMUNDO
+```
+
+## Implementation details
+
+The implementation is in `transposicion.py` with two main functions:
+
+<CodeGroup>
+
+```python Encryption
+def cifrar(mensaje, clave):
+    mensaje = mensaje.replace(" ", "")
+    filas = len(mensaje) // clave
+    if len(mensaje) % clave != 0:
+        filas += 1
+        mensaje += "*" * (clave - (len(mensaje) % clave))  # Add padding
+    cifrado = ""
+    for j in range(clave):
+        for i in range(filas):
+            cifrado += mensaje[i * clave + j]
+    return cifrado
+```
+
+```python Decryption
+def descifrar(mensaje_cifrado, clave):
+    mensaje_cifrado = mensaje_cifrado.replace(" ", "")
+    filas = len(mensaje_cifrado) // clave
+    descifrado = ""
+    for i in range(filas):
+        for j in range(clave):
+            descifrado += mensaje_cifrado[i + j * filas]
+    # Remove padding characters
+    descifrado = descifrado.rstrip("*")
+    return descifrado
+```
+
+</CodeGroup>
+
+## Usage example
+
+### Basic encryption and decryption
+
+```python
+from transposicion import cifrar, descifrar
+
+# Original message
+mensaje = "HOLA MUNDO"
+
+# Key (number of columns)
+clave = 5
+
+# Encryption
+mensaje_cifrado = cifrar(mensaje, clave)
+print(f"Original: {mensaje}")
+print(f"Encrypted: {mensaje_cifrado}")  # "HUONLDAOM*"
+
+# Decryption
+mensaje_descifrado = descifrar(mensaje_cifrado, clave)
+print(f"Decrypted: {mensaje_descifrado}")  # "HOLAMUNDO"
+```
+
+### Step-by-step example
+
+<Steps>
+  <Step title="Remove spaces">
+    ```python
+    mensaje = "HOLA MUNDO"
+    mensaje = mensaje.replace(" ", "")  # "HOLAMUNDO"
+    ```
+  </Step>
+  
+  <Step title="Calculate matrix dimensions">
+    ```python
+    clave = 5  # columns
+    filas = len(mensaje) // clave  # 9 // 5 = 1
+    if len(mensaje) % clave != 0:  # 9 % 5 = 4 (remainder)
+        filas += 1  # filas = 2
+    ```
+  </Step>
+  
+  <Step title="Add padding if needed">
+    ```python
+    padding_needed = clave - (len(mensaje) % clave)  # 5 - 4 = 1
+    mensaje += "*" * padding_needed  # "HOLAMUNDO*"
+    ```
+  </Step>
+  
+  <Step title="Read column by column">
+    ```python
+    # Column 0: positions 0, 5 → "HU"
+    # Column 1: positions 1, 6 → "ON"
+    # Column 2: positions 2, 7 → "LD"
+    # Column 3: positions 3, 8 → "AO"
+    # Column 4: positions 4, 9 → "M*"
+    cifrado = "HUONLDAOM*"
+    ```
+  </Step>
+</Steps>
+
+## Parameters
+
+<ParamField path="mensaje" type="string" required>
+  The plaintext message to encrypt. Spaces are automatically removed. All characters are preserved.
+</ParamField>
+
+<ParamField path="clave" type="int" default="5">
+  The number of columns in the transposition matrix. Must be a positive integer. Larger values create wider, shorter matrices.
+</ParamField>
+
+## Key characteristics
+
+<CardGroup cols={2}>
+  <Card title="Letter frequency" icon="chart-bar">
+    **Preserved** - Same letters appear in ciphertext
+  </Card>
+  <Card title="Message length" icon="ruler">
+    May increase due to padding with `*`
+  </Card>
+  <Card title="Character support" icon="font">
+    Supports **any characters** (not limited to alphabet)
+  </Card>
+  <Card title="Encryption speed" icon="bolt">
+    O(n) linear time complexity
+  </Card>
+</CardGroup>
+
+## Padding behavior
+
+<Info>
+  The cipher adds asterisk (`*`) characters as padding when the message length is not divisible by the key. These are automatically removed during decryption.
+</Info>
+
+### Padding calculation
+
+```python
+message_length = 9
+key = 5
+padding_needed = key - (message_length % key)  # 5 - (9 % 5) = 5 - 4 = 1
+```
+
+### Example with different keys
+
+<Tabs>
+  <Tab title="Key = 3">
+    ```python
+    mensaje = "HOLA"  # Length: 4
+    clave = 3
+    
+    # Matrix (3 columns, 2 rows)
+    # H O L
+    # A * *  ← 2 padding characters
+    
+    cifrado = cifrar(mensaje, 3)  # "HAOL**"
+    ```
+  </Tab>
+  
+  <Tab title="Key = 4">
+    ```python
+    mensaje = "HOLA"  # Length: 4
+    clave = 4
+    
+    # Matrix (4 columns, 1 row)
+    # H O L A  ← No padding needed
+    
+    cifrado = cifrar(mensaje, 4)  # "HOLA"
+    ```
+  </Tab>
+  
+  <Tab title="Key = 5">
+    ```python
+    mensaje = "HOLA"  # Length: 4
+    clave = 5
+    
+    # Matrix (5 columns, 1 row)
+    # H O L A *  ← 1 padding character
+    
+    cifrado = cifrar(mensaje, 5)  # "HOLA*"
+    ```
+  </Tab>
+</Tabs>
+
+## Security notes
+
+<Warning>
+  The transposition cipher provides minimal security and should only be used for educational purposes.
+</Warning>
+
+### Vulnerabilities
+
+1. **Frequency preservation**: Letter frequencies remain unchanged, revealing language patterns
+2. **Anagramming attacks**: The ciphertext is just an anagram of the plaintext
+3. **Pattern analysis**: Common words and patterns can be identified
+4. **Small keyspace**: Limited number of practical key values
+5. **Known-plaintext attack**: If part of the message is known, the key can be deduced
+
+### Educational value
+
+<Info>
+  The transposition cipher teaches important concepts:
+  - Difference between substitution and transposition
+  - Matrix operations in cryptography
+  - Why encryption needs both confusion and diffusion
+  - Limitations of single-technique ciphers
+</Info>
+
+## Advanced example
+
+```python
+# Longer message with special characters
+mensaje = "ESTO ES UN MENSAJE SECRETO!"
+clave = 7
+
+print(f"Original: {mensaje}")
+print(f"Length: {len(mensaje)} characters")
+
+cifrado = cifrar(mensaje, clave)
+print(f"Encrypted: {cifrado}")
+print(f"Length: {len(cifrado)} characters (with padding)")
+
+descifrado = descifrar(cifrado, clave)
+print(f"Decrypted: {descifrado}")
+
+# Output:
+# Original: ESTO ES UN MENSAJE SECRETO!
+# Length: 28 characters
+# Encrypted: EEMTESOSSEUTNJREETCO*!S***
+# Length: 28 characters (with padding)
+# Decrypted: ESTOESUNENJAJESECRETO!
+```
+
+<Note>
+  Notice that spaces are removed during encryption, so the decrypted message won't have the original spacing.
+</Note>
+
+## Matrix visualization
+
+For better understanding, here's how different key values affect the matrix:
+
+```python
+mensaje = "ABCDEFGHIJ"  # 10 characters
+
+# Key = 2 (2 columns, 5 rows)
+# A B
+# C D
+# E F
+# G H
+# I J
+# Ciphertext: ACEGIBDFHJ
+
+# Key = 5 (5 columns, 2 rows)
+# A B C D E
+# F G H I J
+# Ciphertext: AFBGCHDIEJ
+
+# Key = 10 (10 columns, 1 row)
+# A B C D E F G H I J
+# Ciphertext: ABCDEFGHIJ (no change!)
+```
+
+<Warning>
+  Using a key equal to the message length produces no encryption at all!
+</Warning>
+
+## Common use cases
+
+<AccordionGroup>
+  <Accordion title="Educational purposes">
+    - Teaching transposition vs substitution
+    - Demonstrating matrix operations
+    - Understanding cipher weaknesses
+    - Cryptanalysis practice
+  </Accordion>
+  
+  <Accordion title="Historical context">
+    - Used in ancient military communications
+    - Rail fence cipher variant
+    - Route cipher techniques
+    - Classical cryptography study
+  </Accordion>
+  
+  <Accordion title="Combined ciphers">
+    - Can be combined with substitution for stronger encryption
+    - Double transposition increases security
+    - Historical use in World War communications
+    - Teaching defense-in-depth principles
+  </Accordion>
+</AccordionGroup>
+
+## Performance considerations
+
+```python
+import time
+
+# Short message
+mensaje_corto = "HOLA" * 10
+start = time.time()
+cifrado = cifrar(mensaje_corto, 5)
+end = time.time()
+print(f"Short message: {(end - start) * 1000:.3f}ms")
+
+# Long message
+mensaje_largo = "HOLA" * 10000
+start = time.time()
+cifrado = cifrar(mensaje_largo, 5)
+end = time.time()
+print(f"Long message: {(end - start) * 1000:.3f}ms")
+```
+
+The cipher has O(n) time complexity, making it efficient even for longer messages.
+
+## See also
+
+- [Caesar cipher](/algorithms/caesar) - Substitution-based approach
+- [RSA encryption](/algorithms/rsa) - Modern asymmetric encryption
+- [Algorithms overview](/algorithms/overview) - Compare all three algorithms

@@ -1,0 +1,134 @@
+---
+title: Algorithms overview
+description: Comparison and overview of the three classic encryption algorithms implemented in this project
+---
+
+This project implements three classic cryptographic algorithms, each representing different approaches to encryption: substitution, transposition, and asymmetric cryptography.
+
+## Available algorithms
+
+<CardGroup cols={3}>
+  <Card title="Caesar cipher" icon="arrow-right-arrow-left" href="/algorithms/caesar">
+    Substitution cipher that shifts letters by a fixed position
+  </Card>
+  <Card title="Transposition cipher" icon="table" href="/algorithms/transposition">
+    Rearranges message letters using a columnar transposition matrix
+  </Card>
+  <Card title="RSA encryption" icon="key" href="/algorithms/rsa">
+    Asymmetric encryption using public and private key pairs
+  </Card>
+</CardGroup>
+
+## Comparison table
+
+| Feature | Caesar | Transposition | RSA |
+|---------|--------|---------------|-----|
+| **Type** | Substitution | Transposition | Asymmetric |
+| **Key type** | Single integer (shift) | Column count | Public/private key pair |
+| **Default key** | 8 positions | 5 columns | 32-bit keys |
+| **Alphabet support** | Spanish (A-Z + Ñ) | Any characters | ASCII characters |
+| **Complexity** | Very low | Low | High |
+| **Security level** | Educational only | Educational only | Educational only |
+| **Output format** | Text | Text | Array of numbers |
+
+## Security considerations
+
+<Warning>
+  All three algorithms in this project are implemented for **educational purposes only** and should never be used for real-world encryption.
+</Warning>
+
+### Why these implementations are not secure
+
+<AccordionGroup>
+  <Accordion title="Caesar cipher vulnerabilities">
+    - Only 27 possible keys (easily brute-forced)
+    - Vulnerable to frequency analysis
+    - No protection against known-plaintext attacks
+    - Trivial computational complexity to break
+  </Accordion>
+  
+  <Accordion title="Transposition cipher vulnerabilities">
+    - Does not hide letter frequencies
+    - Vulnerable to anagramming attacks
+    - Pattern analysis can reveal the key
+    - No protection for short messages
+  </Accordion>
+  
+  <Accordion title="RSA implementation vulnerabilities">
+    - 32-bit keys are extremely weak (can be factored in seconds)
+    - No padding scheme (vulnerable to various attacks)
+    - No salt or randomization
+    - Simple prime generation without cryptographic guarantees
+    - Production RSA uses 2048+ bit keys minimum
+  </Accordion>
+</AccordionGroup>
+
+<Info>
+  For production cryptography, use established libraries like `cryptography` or `pycryptodome` that implement modern, secure algorithms with proper key sizes and security measures.
+</Info>
+
+## Choosing an algorithm
+
+### For learning purposes
+
+<Tabs>
+  <Tab title="Start with Caesar">
+    **Best for beginners**
+    
+    The Caesar cipher is the simplest to understand and implement. It's perfect for:
+    - Understanding basic encryption concepts
+    - Learning about modular arithmetic
+    - Exploring frequency analysis attacks
+    - First steps in cryptography
+  </Tab>
+  
+  <Tab title="Then Transposition">
+    **Next level complexity**
+    
+    Transposition introduces matrix operations and shows:
+    - How encryption can work without substitution
+    - Matrix-based cryptographic techniques
+    - Padding and message formatting
+    - Different attack vectors than substitution ciphers
+  </Tab>
+  
+  <Tab title="Finally RSA">
+    **Advanced concepts**
+    
+    RSA demonstrates modern cryptographic principles:
+    - Public-key cryptography fundamentals
+    - Number theory in practice (primes, modular inverse)
+    - Key generation and management
+    - Asymmetric vs symmetric encryption
+  </Tab>
+</Tabs>
+
+## Common features
+
+All three algorithms in this project share:
+
+- **Encrypt and decrypt functions**: Each algorithm provides bidirectional operations
+- **Key-based encryption**: All require a key (shift, column count, or key pair)
+- **Python implementation**: Pure Python code without external crypto libraries
+- **CLI and web interface**: Available through `main.py` (console) or `app.py` (Flask)
+- **Spanish language support**: Caesar cipher includes the Ñ character
+
+## Next steps
+
+<Steps>
+  <Step title="Explore individual algorithms">
+    Read the detailed documentation for each algorithm to understand how they work
+  </Step>
+  
+  <Step title="Try the examples">
+    Use the provided code examples to encrypt and decrypt messages
+  </Step>
+  
+  <Step title="Experiment with parameters">
+    Change keys, message lengths, and observe the behavior
+  </Step>
+  
+  <Step title="Learn about attacks">
+    Research how each algorithm can be broken to understand security principles
+  </Step>
+</Steps>

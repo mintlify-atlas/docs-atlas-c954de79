@@ -1,80 +1,167 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quick start
+description: Get started encrypting and decrypting messages with the Caesar, Transposition, and RSA algorithms in minutes
 ---
 
-## Get started in three steps
+# Quick start
 
-Get your documentation site running locally and make your first customization.
+Get up and running with Algoritmos de Encriptamiento in minutes. This guide will show you how to encrypt and decrypt your first message using both the web interface and CLI.
 
-### Step 1: Set up your local environment
+<Note>
+Make sure you've completed the [installation](/installation) before starting this guide.
+</Note>
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
+## Using the web interface
+
+The Flask web application provides an intuitive interface for encrypting and decrypting messages.
+
+<Steps>
+  <Step title="Start the Flask server">
+    Activate your virtual environment and run the application:
+
+    ```bash
+    pipenv shell
+    python app.py
+    ```
+
+    The server will start at `http://localhost:5000`
+  </Step>
+
+  <Step title="Open the web interface">
+    Navigate to `http://localhost:5000` in your web browser. You'll see the encryption interface with options for:
+    - Message input
+    - Operation selection (Encrypt/Decrypt)
+    - Algorithm selection (Sustitución/César, Transposición, RSA)
+  </Step>
+
+  <Step title="Encrypt your first message">
+    1. Enter a message like `HOLA MUNDO` in the text area
+    2. Select **Cifrar** (Encrypt)
+    3. Choose an algorithm (start with **Sustitución (César)**)
+    4. Click **Procesar**
+
+    You'll see the encrypted result immediately!
+  </Step>
+</Steps>
+
+### Example: Encrypting with each algorithm
+
+<Tabs>
+  <Tab title="Caesar cipher">
+    **Input**: `HOLA MUNDO`
     
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
+    **Steps**:
+    1. Enter: `HOLA MUNDO`
+    2. Operation: **Cifrar**
+    3. Algorithm: **Sustitución (César)**
     
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
+    **Output**: `OWSITCULW`
     
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    The Caesar cipher shifts each letter by 8 positions in the Spanish alphabet (including Ñ).
+  </Tab>
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+  <Tab title="Transposition cipher">
+    **Input**: `HOLA MUNDO`
+    
+    **Steps**:
+    1. Enter: `HOLA MUNDO`
+    2. Operation: **Cifrar**
+    3. Algorithm: **Transposición**
+    
+    **Output**: `HUONLDAOM*`
+    
+    The transposition cipher rearranges letters in a 5-column matrix. The `*` is padding.
+  </Tab>
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+  <Tab title="RSA">
+    **Input**: `HOLA MUNDO`
+    
+    **Steps**:
+    1. Enter: `HOLA MUNDO`
+    2. Operation: **Cifrar**
+    3. Algorithm: **RSA**
+    
+    **Output**: `[210781516, 270112935, 1336237868, 54163841, ...]`
+    
+    **Important**: The web interface stores RSA keys in the session. To decrypt:
+    1. Copy the entire list of numbers from the result
+    2. Select **Descifrar** (Decrypt)
+    3. Paste the list exactly as shown
+    4. The same session keys will decrypt your message
+    
+    <Warning>
+    RSA decryption only works in the same browser session where you encrypted. Refresh the page and you'll need to encrypt again to generate new keys.
+    </Warning>
+  </Tab>
+</Tabs>
 
-### Step 3: Go live
+## Using the CLI
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+The command-line interface applies all three algorithms to your message automatically.
+
+<Steps>
+  <Step title="Run the CLI tool">
+    Activate your virtual environment and run:
+
+    ```bash
+    pipenv shell
+    python main.py
+    ```
+  </Step>
+
+  <Step title="Enter your message">
+    The program will prompt you for input:
+
+    ```bash
+    Ingrese el mensaje a operar: HOLA MUNDO
+    ```
+  </Step>
+
+  <Step title="View the results">
+    The CLI will automatically encrypt and decrypt using all three algorithms:
+
+    ```
+    Mensaje original: HOLAMUNDO
+    
+    El mensaje cifrado es: OWSITCULW
+    El mensaje descifrado es: HOLAMUNDO
+    
+    El mensaje cifrado es: HUONLDAOM*
+    El mensaje descifrado es: HOLAMUNDO
+    
+    Mensaje cifrado: [210781516, 270112935, 1336237868, 54163841, ...]
+    Mensaje descifrado: HOLA MUNDO
+    ```
+  </Step>
+</Steps>
+
+### Understanding the CLI output
+
+The CLI demonstrates each algorithm's complete encryption/decryption cycle:
+
+1. **Caesar cipher**: Shows the shifted text and the decrypted result
+2. **Transposition cipher**: Displays the rearranged text with padding and the decrypted result
+3. **RSA**: Generates new keys, shows the encrypted numbers, and decrypts back to the original message
 
 ## Next steps
 
-Now that you have your docs running, explore these key features:
+Now that you've encrypted your first message, explore more:
 
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Algorithm details" icon="key" href="/algorithms/overview">
+    Learn how each encryption algorithm works
+  </Card>
+  <Card title="Web interface guide" icon="window" href="/guides/web-interface">
+    Master the Flask web application
+  </Card>
+  <Card title="CLI usage" icon="terminal" href="/guides/cli-usage">
+    Advanced command-line techniques
+  </Card>
+  <Card title="Code examples" icon="code" href="/guides/examples">
+    Real-world usage examples
+  </Card>
 </CardGroup>
 
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>
+<Info>
+Remember: This tool is for educational purposes. The encryption methods (especially 32-bit RSA) are not secure for real-world use. See [security notes](/security-notes) for details.
+</Info>

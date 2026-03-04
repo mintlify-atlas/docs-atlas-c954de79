@@ -1,0 +1,231 @@
+---
+title: Transposition cipher module
+description: Column transposition cipher implementation for encrypting messages by rearranging character positions
+---
+
+The `transposicion` module implements a columnar transposition cipher that encrypts messages by writing them in rows and reading them in columns.
+
+## cifrar
+
+Encrypts a message using columnar transposition by arranging characters into a grid and reading column-by-column.
+
+```python
+def cifrar(mensaje, clave)
+```
+
+<ParamField path="mensaje" type="str" required>
+  The message to encrypt. Spaces are automatically removed before encryption.
+</ParamField>
+
+<ParamField path="clave" type="int" required>
+  The number of columns to use in the transposition grid (the encryption key).
+</ParamField>
+
+<ResponseField name="return" type="str">
+  The encrypted message. If the message length is not divisible by the key, asterisks (*) are added as padding.
+</ResponseField>
+
+<Note>
+  The function automatically pads the message with asterisks (*) if its length is not a multiple of the key value. This ensures a complete rectangular grid.
+</Note>
+
+### How it works
+
+The encryption process:
+1. Removes all spaces from the message
+2. Calculates the number of rows needed based on the key (columns)
+3. Pads the message with asterisks if needed to complete the grid
+4. Arranges the message in a grid row-by-row
+5. Reads the grid column-by-column to create the ciphertext
+
+### Example
+
+```python
+import transposicion
+
+mensaje = "HOLA MUNDO"
+clave = 5
+
+cifrado = transposicion.cifrar(mensaje, clave)
+print(f"Encrypted: {cifrado}")
+# Output: "HMNOUDAL*O*"
+
+# The grid visualization:
+# H O L A M
+# U N D O *
+# Reading columns: H,U then O,N then L,D then A,O then M,*
+```
+
+### Real-world usage
+
+<CodeGroup>
+
+```python Basic encryption
+import transposicion
+
+mensaje = "ATTACK AT DAWN"
+clave = 4
+
+resultado = transposicion.cifrar(mensaje, clave)
+print(resultado)
+# The spaces are removed and message is encrypted
+```
+
+```python From Flask app
+import transposicion
+
+def transposicion_cifrar(mensaje, clave):
+    cifrado = transposicion.cifrar(mensaje, clave)
+    return cifrado
+
+# Usage in web application
+mensaje_usuario = "MENSAJE SECRETO"
+cifrado = transposicion_cifrar(mensaje_usuario, 5)
+```
+
+</CodeGroup>
+
+## descifrar
+
+Decrypts a message that was encrypted using columnar transposition.
+
+```python
+def descifrar(mensaje_cifrado, clave)
+```
+
+<ParamField path="mensaje_cifrado" type="str" required>
+  The encrypted message to decrypt. Spaces are automatically removed.
+</ParamField>
+
+<ParamField path="clave" type="int" required>
+  The number of columns used during encryption (must match the encryption key).
+</ParamField>
+
+<ResponseField name="return" type="str">
+  The decrypted message with padding asterisks removed from the end.
+</ResponseField>
+
+<Note>
+  The key used for decryption must match the key used for encryption, otherwise the output will be gibberish.
+</Note>
+
+### How it works
+
+The decryption process:
+1. Removes all spaces from the encrypted message
+2. Calculates the number of rows in the original grid
+3. Reads the encrypted message column-by-column
+4. Reconstructs the original message row-by-row
+5. Removes trailing asterisk padding characters
+
+### Example
+
+```python
+import transposicion
+
+mensaje_cifrado = "HMNOUDAL*O*"
+clave = 5
+
+descifrado = transposicion.descifrar(mensaje_cifrado, clave)
+print(f"Decrypted: {descifrado}")
+# Output: "HOLAMUNDO"
+```
+
+### Real-world usage
+
+<CodeGroup>
+
+```python Basic decryption
+import transposicion
+
+# Decrypt a message
+mensaje_cifrado = "TACDTKWANA*"
+clave = 4
+
+original = transposicion.descifrar(mensaje_cifrado, clave)
+print(original)
+# Returns the original message without padding
+```
+
+```python From Flask app
+import transposicion
+
+def transposicion_descifrar(mensaje, clave):
+    descifrado = transposicion.descifrar(mensaje, clave)
+    return descifrado
+
+# Usage in web application
+mensaje_cifrado = "EJNIASCSEERTO**"
+original = transposicion_descifrar(mensaje_cifrado, 5)
+```
+
+</CodeGroup>
+
+## Complete encryption workflow
+
+Here's a complete example demonstrating encryption and decryption:
+
+<CodeGroup>
+
+```python Complete workflow
+import transposicion
+
+# Original message
+mensaje = "MEET ME AT THE PARK"
+print(f"Original: {mensaje}")
+
+# Encrypt
+clave = 6
+cifrado = transposicion.cifrar(mensaje, clave)
+print(f"Encrypted: {cifrado}")
+
+# Decrypt
+descifrado = transposicion.descifrar(cifrado, clave)
+print(f"Decrypted: {descifrado}")
+```
+
+```python From main.py
+import transposicion
+import util
+
+def transposicion_cifrar(mensaje, clave):
+    cifrado = transposicion.cifrar(mensaje, clave)
+    util.printResultado("cifrado", cifrado)
+    return cifrado
+
+def transposicion_descifrar(mensaje, clave):
+    descifrado = transposicion.descifrar(mensaje, clave)
+    util.printResultado("descifrado", descifrado)
+    return descifrado
+
+# Test transposition
+mensaje = "HOLA MUNDO"
+clave = 5
+transp_cifrado = transposicion_cifrar(mensaje, clave)
+transposicion_descifrar(transp_cifrado, clave)
+```
+
+</CodeGroup>
+
+## Key selection guidelines
+
+<Note>
+  **Choosing the right key:**
+  - Smaller keys (2-3): Less secure but faster
+  - Medium keys (4-8): Good balance of security and usability
+  - Larger keys (9+): More secure but requires longer messages for effectiveness
+  - The key should be smaller than the message length for meaningful encryption
+</Note>
+
+### Example with different keys
+
+```python
+import transposicion
+
+mensaje = "TRANSPOSITION CIPHER"
+
+# Different key sizes
+for clave in [3, 5, 7]:
+    cifrado = transposicion.cifrar(mensaje, clave)
+    print(f"Key {clave}: {cifrado}")
+```

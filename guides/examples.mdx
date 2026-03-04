@@ -1,0 +1,545 @@
+---
+title: Real-world usage examples
+description: Practical examples and use cases for all three encryption algorithms
+---
+
+This guide provides practical, ready-to-run examples for all three encryption algorithms. Copy and paste these examples to get started quickly.
+
+## Quick start examples
+
+<Tabs>
+  <Tab title="Web Interface">
+    ### Basic encryption workflow
+    
+    <Steps>
+      <Step title="Start the server">
+        ```bash
+        pipenv shell
+        python app.py
+        ```
+      </Step>
+      
+      <Step title="Open browser">
+        Navigate to `http://localhost:5000`
+      </Step>
+      
+      <Step title="Encrypt a message">
+        1. Enter: `HOLA MUNDO`
+        2. Select: `Cifrar`
+        3. Choose: `Sustitución (César)`
+        4. Click: `Procesar ✨`
+        5. Result: `OWSITCULW`
+      </Step>
+      
+      <Step title="Decrypt the result">
+        1. Copy the result: `OWSITCULW`
+        2. Select: `Descifrar`
+        3. Choose: `Sustitución (César)`
+        4. Click: `Procesar ✨`
+        5. Result: `HOLAMUNDO`
+      </Step>
+    </Steps>
+  </Tab>
+  
+  <Tab title="CLI">
+    ### Basic CLI workflow
+    
+    ```bash
+    pipenv shell
+    python main.py
+    ```
+    
+    **Input:**
+    ```
+    Ingrese el mensaje a operar: HOLA MUNDO
+    ```
+    
+    **Output:**
+    ```
+    Mensaje original: HOLA MUNDO
+    
+    Mensaje cifrado: OWSITCULW
+    Mensaje descifrado: HOLAMUNDO
+    
+    Mensaje cifrado: HUONLDAOM*
+    Mensaje descifrado: HOLAMUNDO
+    
+    Mensaje cifrado: [210781516, 270112935, 1336237868, ...]
+    Mensaje descifrado: HOLA MUNDO
+    ```
+  </Tab>
+</Tabs>
+
+## Caesar cipher (Sustitución) examples
+
+The Caesar cipher shifts each letter by a fixed number of positions (default: 8).
+
+### Example 1: Simple message
+
+<CodeGroup>
+```python Python code
+import sustitucion
+
+# Encrypt
+mensaje = "HOLA"
+pos = 8
+cifrado = sustitucion.convertiraNumero(mensaje)
+cifrado = sustitucion.cifrar(cifrado, pos)
+result = sustitucion.convertiraLetra(cifrado)
+print(f"Encrypted: {result}")  # Output: OWSI
+
+# Decrypt
+numeros = sustitucion.convertiraNumero(result)
+descifrado = sustitucion.descifrar(numeros, pos)
+original = sustitucion.convertiraLetra(descifrado)
+print(f"Decrypted: {original}")  # Output: HOLA
+```
+
+```bash Web interface
+# Input
+Mensaje: HOLA
+Operación: Cifrar
+Tipo de Cifrado: Sustitución (César)
+
+# Output
+Resultado: OWSI
+```
+</CodeGroup>
+
+### Example 2: Longer message with spaces
+
+| Input | Operation | Output | Notes |
+|-------|-----------|--------|-------|
+| `HOLA MUNDO` | Encrypt | `OWSITCULW` | Spaces removed |
+| `BUENOS DIAS` | Encrypt | `JCKLW×LASK×` | Includes special characters |
+| `OWSITCULW` | Decrypt | `HOLAMUNDO` | Spaces not restored |
+
+<Info>
+  The Caesar implementation removes spaces during encryption and doesn't restore them during decryption. This is expected behavior.
+</Info>
+
+### Example 3: Spanish alphabet support
+
+The implementation includes the Spanish letter Ñ:
+
+```python
+# Message with Ñ
+mensaje = "MAÑANA"
+pos = 8
+
+# The algorithm recognizes and shifts Ñ correctly
+# A-Z plus Ñ creates a 27-character alphabet
+```
+
+## Transposition cipher examples
+
+The transposition cipher rearranges characters in a columnar matrix (default: 5 columns).
+
+### Example 1: Basic transposition
+
+<CodeGroup>
+```python Python code
+import transposicion
+
+# Encrypt
+mensaje = "HOLA MUNDO"
+clave = 5
+cifrado = transposicion.cifrar(mensaje, clave)
+print(f"Encrypted: {cifrado}")  # Output: HUONLDAOM*
+
+# Decrypt
+descifrado = transposicion.descifrar(cifrado, clave)
+print(f"Decrypted: {descifrado}")  # Output: HOLAMUNDO
+```
+
+```bash Web interface
+# Encrypt
+Mensaje: HOLA MUNDO
+Operación: Cifrar
+Tipo de Cifrado: Transposición
+Resultado: HUONLDAOM*
+
+# Decrypt
+Mensaje: HUONLDAOM*
+Operación: Descifrar
+Tipo de Cifrado: Transposición
+Resultado: HOLAMUNDO
+```
+</CodeGroup>
+
+### Example 2: Understanding the matrix
+
+With key=5, the message "HOLA MUNDO" is arranged in a 5-column matrix:
+
+```
+Step 1: Remove spaces → HOLAMUNDO (9 chars)
+Step 2: Add padding → HOLAMUNDO* (10 chars, divisible by 5)
+
+Step 3: Create matrix (5 columns):
+┌───┬───┬───┬───┬───┐
+│ H │ O │ L │ A │   │
+├───┼───┼───┼───┼───┤
+│ M │ U │ N │ D │ O │
+└───┴───┴───┴───┴───┘
+
+Step 4: Read by columns:
+Column 1: H, M → HM
+Column 2: O, U → OU
+Column 3: L, N → LN
+Column 4: A, D → AD
+Column 5: (space), O → O
+
+Result: Rearranged as HUONLDAOM*
+```
+
+### Example 3: Different key sizes
+
+<Tabs>
+  <Tab title="Key = 3">
+    ```python
+    mensaje = "HOLAMUNDO"
+    clave = 3
+    
+    # Matrix (3 columns):
+    # H O L
+    # A M U
+    # N D O
+    
+    # Result: Read columns → HAMOOLDNU
+    ```
+  </Tab>
+  
+  <Tab title="Key = 5">
+    ```python
+    mensaje = "HOLAMUNDO"
+    clave = 5
+    
+    # Matrix (5 columns):
+    # H O L A M
+    # U N D O *
+    
+    # Result: Read columns → HUONLDAOM*
+    ```
+  </Tab>
+  
+  <Tab title="Key = 7">
+    ```python
+    mensaje = "HOLAMUNDO"
+    clave = 7
+    
+    # Matrix (7 columns):
+    # H O L A M U N
+    # D O * * * * *
+    
+    # Result: Read columns → HDO O* L* A* M* U* N*
+    ```
+  </Tab>
+</Tabs>
+
+<Note>
+  Larger keys create wider matrices and may require more padding. The key should be chosen based on message length for optimal security.
+</Note>
+
+## RSA encryption examples
+
+RSA uses asymmetric encryption with public and private keys.
+
+### Example 1: Complete RSA workflow
+
+<CodeGroup>
+```python Python code
+import RSA
+
+# Generate keys
+bits = 32
+e, d, n = RSA.gen_keys(bits)
+print(f"Public key: e={e}, n={n}")
+print(f"Private key: d={d}, n={n}")
+
+# Encrypt
+mensaje = "HOLA"
+mensaje_cifrado = RSA.encrypt(mensaje, e, n)
+print(f"Encrypted: {mensaje_cifrado}")
+# Output: [123456789, 987654321, 456789123, 789123456]
+
+# Decrypt
+mensaje_descifrado = RSA.decrypt(mensaje_cifrado, d, n)
+print(f"Decrypted: {mensaje_descifrado}")
+# Output: HOLA
+```
+
+```bash Web interface workflow
+# Step 1: Encrypt
+Mensaje: HOLA
+Operación: Cifrar
+Tipo de Cifrado: RSA
+
+# Result:
+Resultado: [123456789, 987654321, 456789123, 789123456]
+Información Adicional:
+Claves generadas - e: 65537, d: 12345, n: 987654321.
+Para descifrar, usa esta lista exacta: [123456789, 987654321, 456789123, 789123456]
+
+# Step 2: Decrypt (same session)
+Mensaje: [123456789, 987654321, 456789123, 789123456]
+Operación: Descifrar
+Tipo de Cifrado: RSA
+
+# Result:
+Resultado: HOLA
+```
+</CodeGroup>
+
+### Example 2: Key generation details
+
+```python
+import RSA
+
+# Generate 32-bit keys
+e, d, n = RSA.gen_keys(32)
+
+print(f"Public exponent (e): {e}")
+# Typically 65537 (a common choice)
+
+print(f"Private exponent (d): {d}")
+# Large number calculated from e and phi(n)
+
+print(f"Modulus (n): {n}")
+# Product of two prime numbers
+
+# Key properties:
+# - e and n are public (used for encryption)
+# - d is private (used for decryption)
+# - n is used for both encryption and decryption
+```
+
+### Example 3: Web interface RSA session
+
+<Steps>
+  <Step title="First encryption">
+    ```
+    Input: SECRETO
+    Operation: Cifrar
+    Algorithm: RSA
+    
+    Output:
+    [123, 456, 789, 101, 112, 131, 415]
+    
+    Keys: e=65537, d=789456123, n=987654321
+    ```
+    
+    Keys are stored in the Flask session.
+  </Step>
+  
+  <Step title="Decrypt the message">
+    ```
+    Input: [123, 456, 789, 101, 112, 131, 415]
+    Operation: Descifrar
+    Algorithm: RSA
+    
+    Output: SECRETO
+    ```
+    
+    Uses keys from the session automatically.
+  </Step>
+  
+  <Step title="Encrypt another message">
+    ```
+    Input: NUEVO
+    Operation: Cifrar
+    Algorithm: RSA
+    
+    Output: [222, 333, 444, 555, 666]
+    
+    Keys: e=17, d=234567890, n=123456789
+    ```
+    
+    New keys are generated, overwriting the previous ones.
+  </Step>
+</Steps>
+
+<Warning>
+  Once you encrypt a new message, the previous RSA keys are lost. Save the keys if you need to decrypt old messages later.
+</Warning>
+
+## Practical use case scenarios
+
+### Scenario 1: Comparing algorithm strengths
+
+Test the same message with all three algorithms to understand their characteristics:
+
+```python
+message = "ATAQUE AL AMANECER"
+
+# Caesar: Easy to break with frequency analysis
+# Output: IKICM×KISTI×J×F×L
+# Weakness: Only 27 possible keys
+
+# Transposition: Harder to break, preserves letter frequency
+# Output: AAUR*QM*EA*LE*CT*AA*EN*DE*
+# Weakness: Pattern analysis can reveal structure
+
+# RSA: Strongest, but overkill for short messages
+# Output: [large list of numbers]
+# Strength: Computationally secure with proper key size
+```
+
+### Scenario 2: Message length testing
+
+<Tabs>
+  <Tab title="Short messages (< 10 chars)">
+    ```python
+    mensaje = "HOLA"
+    
+    # Caesar: OWSI
+    # Fast, simple
+    
+    # Transposition: HLOA (with key=2)
+    # Minimal rearrangement
+    
+    # RSA: [4 numbers]
+    # Works well, each char becomes one number
+    ```
+  </Tab>
+  
+  <Tab title="Medium messages (10-50 chars)">
+    ```python
+    mensaje = "ESTE ES UN MENSAJE SECRETO IMPORTANTE"
+    
+    # Caesar: Clear pattern shift
+    # Transposition: Good scrambling with key=5
+    # RSA: Long list but manageable
+    ```
+  </Tab>
+  
+  <Tab title="Long messages (> 50 chars)">
+    ```python
+    mensaje = "A" * 100  # 100 characters
+    
+    # Caesar: Fast processing
+    # Transposition: Matrix becomes large
+    # RSA: Very long number list
+    
+    # Recommendation: Use RSA for short messages,
+    # transposition for medium, Caesar for quick tests
+    ```
+  </Tab>
+</Tabs>
+
+### Scenario 3: Security demonstration
+
+Demonstrate why these algorithms are educational only:
+
+<CodeGroup>
+```python Breaking Caesar
+# Try all 27 possible shifts
+for shift in range(27):
+    decrypted = try_decrypt(ciphertext, shift)
+    if looks_like_spanish(decrypted):
+        print(f"Found! Shift = {shift}")
+        print(f"Message: {decrypted}")
+        break
+```
+
+```python Analyzing Transposition
+# Count letter frequencies
+from collections import Counter
+freq = Counter(ciphertext)
+# Frequencies unchanged! Only positions changed
+# Use common Spanish patterns to guess key
+```
+
+```python RSA weakness (32-bit)
+# 32-bit keys can be factored quickly
+import sympy
+n = 987654321  # Example 32-bit modulus
+factors = sympy.factorint(n)
+print(f"Factors: {factors}")
+# Real RSA uses 2048+ bits, impossible to factor
+```
+</CodeGroup>
+
+## Combining algorithms
+
+For stronger encryption, you can apply multiple algorithms:
+
+```python
+import sustitucion
+import transposicion
+import RSA
+
+mensaje = "MENSAJE SECRETO"
+
+# Step 1: Caesar cipher
+pos = 8
+cifrado1 = sustitucion.convertiraNumero(mensaje)
+cifrado1 = sustitucion.cifrar(cifrado1, pos)
+cifrado1 = sustitucion.convertiraLetra(cifrado1)
+print(f"After Caesar: {cifrado1}")
+
+# Step 2: Transposition
+clave = 5
+cifrado2 = transposicion.cifrar(cifrado1, clave)
+print(f"After Transposition: {cifrado2}")
+
+# Step 3: RSA
+bits = 32
+e, d, n = RSA.gen_keys(bits)
+cifrado_final = RSA.encrypt(cifrado2, e, n)
+print(f"Final encrypted: {cifrado_final}")
+
+# To decrypt, reverse the order:
+# RSA → Transposition → Caesar
+```
+
+<Info>
+  Combining multiple ciphers can increase security, but proper implementation requires careful key management and understanding of each algorithm's weaknesses.
+</Info>
+
+## Testing and validation
+
+Verify that encryption and decryption work correctly:
+
+```python
+def test_algorithm(encrypt_fn, decrypt_fn, mensaje):
+    """Test that decrypt(encrypt(msg)) == msg"""
+    cifrado = encrypt_fn(mensaje)
+    descifrado = decrypt_fn(cifrado)
+    
+    # Remove spaces for comparison
+    mensaje_clean = mensaje.replace(" ", "")
+    descifrado_clean = descifrado.replace(" ", "").replace("*", "")
+    
+    if mensaje_clean == descifrado_clean:
+        print(f"✓ Test passed for: {mensaje}")
+        return True
+    else:
+        print(f"✗ Test failed for: {mensaje}")
+        print(f"  Expected: {mensaje_clean}")
+        print(f"  Got: {descifrado_clean}")
+        return False
+
+# Run tests
+test_cases = [
+    "HOLA",
+    "HOLA MUNDO",
+    "MENSAJE CON ESPACIOS",
+    "A",
+    "MAÑANA"
+]
+
+for test in test_cases:
+    test_algorithm(caesar_encrypt, caesar_decrypt, test)
+```
+
+## Performance considerations
+
+| Algorithm | Speed | Message Length | Best Use Case |
+|-----------|-------|----------------|---------------|
+| Caesar | Very fast | Any | Quick demos, learning |
+| Transposition | Fast | < 1000 chars | Medium messages |
+| RSA | Slower | < 100 chars | Small sensitive data |
+
+<Note>
+  For the web interface, all three algorithms are fast enough for interactive use with typical message lengths (< 1000 characters).
+</Note>

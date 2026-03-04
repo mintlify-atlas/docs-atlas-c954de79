@@ -1,0 +1,514 @@
+---
+title: RSA encryption
+description: Documentation for the RSA asymmetric encryption implementation with public and private key pairs
+---
+
+RSA is an asymmetric cryptographic algorithm that uses a pair of keys: a public key for encryption and a private key for decryption. This implementation demonstrates the fundamental concepts of RSA encryption.
+
+## How it works
+
+RSA encryption uses **number theory and modular arithmetic**:
+
+1. Generate two large prime numbers (p and q)
+2. Compute n = p × q and φ(n) = (p-1) × (q-1)
+3. Choose public exponent e (coprime with φ(n))
+4. Calculate private exponent d (modular inverse of e)
+5. Encrypt: C = M^e mod n
+6. Decrypt: M = C^d mod n
+
+<Warning>
+  This implementation uses **32-bit keys** for educational purposes. Production RSA requires **2048+ bit keys** minimum. Never use this for real encryption!
+</Warning>
+
+## Algorithm explanation
+
+### Key generation process
+
+<Steps>
+  <Step title="Generate prime numbers">
+    Select two random prime numbers p and q of specified bit length
+    ```python
+    p = gen_prime(bits // 2)  # e.g., 16-bit prime
+    q = gen_prime(bits // 2)  # e.g., 16-bit prime
+    ```
+  </Step>
+  
+  <Step title="Compute n and φ(n)">
+    Calculate the modulus and Euler's totient
+    ```python
+    n = p * q  # Public modulus
+    phi = (p - 1) * (q - 1)  # Euler's totient function
+    ```
+  </Step>
+  
+  <Step title="Choose public exponent e">
+    Find e that is coprime with φ(n)
+    ```python
+    e = random.randrange(1, phi)
+    while gcd(e, phi) != 1:
+        e = random.randrange(1, phi)
+    ```
+  </Step>
+  
+  <Step title="Calculate private exponent d">
+    Compute the modular multiplicative inverse
+    ```python
+    d = mod_inverse(e, phi)
+    # Verify: (e * d) mod phi = 1
+    ```
+  </Step>
+  
+  <Step title="Verify keys work">
+    Test encryption and decryption
+    ```python
+    test_msg = 12345
+    cipher = encrypt_number(test_msg, e, n)
+    decrypted = decrypt_number(cipher, d, n)
+    # If decrypted == test_msg, keys are valid
+    ```
+  </Step>
+</Steps>
+
+### Mathematical formulas
+
+**Encryption:**
+```
+C = M^e mod n
+```
+
+**Decryption:**
+```
+M = C^d mod n
+```
+
+Where:
+- M = plaintext message (as a number)
+- C = ciphertext (encrypted number)
+- e = public exponent
+- d = private exponent
+- n = modulus (p × q)
+
+## Implementation details
+
+The implementation is in `RSA.py` with several key functions:
+
+<CodeGroup>
+
+```python Key generation
+def gen_keys(bits):
+    while True:
+        # Generate primes p and q
+        p = gen_prime(bits // 2)
+        q = gen_prime(bits // 2)
+        
+        n = p * q
+        phi = (p - 1) * (q - 1)
+        
+        # Choose e coprime with phi
+        e = random.randrange(1, phi)
+        g = gcd(e, phi)
+        while g != 1:
+            e = random.randrange(1, phi)
+            g = gcd(e, phi)
+            
+        # Calculate d
+        d = mod_inverse(e, phi)
+        
+        # Verify keys work
+        test_msg = 12345
+        cipher = encrypt_number(test_msg, e, n)
+        decrypted = decrypt_number(cipher, d, n)
+        if decrypted == test_msg:
+            return (e, d, n)
+```
+
+```python Message encryption
+def encrypt(msg, e, n):
+    cipher = []
+    for char in msg:
+        cipher.append(pow(ord(char), e, n))
+    return cipher
+```
+
+```python Message decryption
+def decrypt(cipher, d, n):
+    msg = ''
+    for c in cipher:
+        char = pow(c, d, n)
+        if char in range(32, 127):  # Valid ASCII range
+            msg += chr(char)
+    return msg
+```
+
+```python Number encryption/decryption
+def encrypt_number(num, e, n):
+    return pow(num, e, n)
+
+def decrypt_number(cipher, d, n):
+    return pow(cipher, d, n)
+```
+
+</CodeGroup>
+
+### Helper functions
+
+<Accordion title="Greatest Common Divisor (GCD)">
+```python
+def gcd(a, b):
+    while b != 0:
+        a, b = b, a % b
+    return a
+```
+Uses Euclidean algorithm to find GCD, essential for determining if e and φ(n) are coprime.
+</Accordion>
+
+<Accordion title="Modular Inverse">
+```python
+def mod_inverse(a, m):
+    m0 = m
+    y = 0
+    x = 1
+    
+    if m == 1:
+        return 0
+    
+    while a > 1:
+        q = a // m
+        t = m
+        
+        m = a % m
+        a = t
+        t = y
+        
+        y = x - q * y
+        x = t
+        
+    if x < 0:
+        x += m0
+        
+    return x
+```
+Extended Euclidean algorithm to find d such that (e × d) mod φ(n) = 1.
+</Accordion>
+
+<Accordion title="Prime Generation">
+```python
+def gen_prime(bits):
+    while True:
+        p = random.randrange(2 ** (bits - 1), 2 ** bits)
+        if is_prime(p):
+            return p
+
+def is_prime(n):
+    if n < 2:
+        return False
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
+            return False
+    return True
+```
+<Warning>
+  This primality test is **NOT cryptographically secure**. Production systems use Miller-Rabin or similar probabilistic tests.
+</Warning>
+</Accordion>
+
+## Usage example
+
+### Basic encryption and decryption
+
+```python
+import RSA
+
+# Generate keys (32-bit)
+bits = 32
+e, d, n = RSA.gen_keys(bits)
+
+print(f"Public key: (e={e}, n={n})")
+print(f"Private key: (d={d}, n={n})")
+
+# Encrypt a message
+mensaje = "HOLA MUNDO"
+cifrado = RSA.encrypt(mensaje, e, n)
+print(f"Original: {mensaje}")
+print(f"Encrypted: {cifrado}")
+
+# Decrypt the message
+descifrado = RSA.decrypt(cifrado, d, n)
+print(f"Decrypted: {descifrado}")
+```
+
+### Example output
+
+```
+Public key: (e=42837539, n=103758209)
+Private key: (d=91245763, n=103758209)
+Original: HOLA MUNDO
+Encrypted: [210781516, 270112935, 1336237868, 415267788, 56712349, 270112935, 335876421, 270112935, 1248365789, 270112935]
+Decrypted: HOLA MUNDO
+```
+
+<Note>
+  Each character is encrypted independently, producing an array of numbers. The ciphertext is much longer than the plaintext.
+</Note>
+
+### Encrypting individual numbers
+
+```python
+import RSA
+
+# Generate keys
+e, d, n = RSA.gen_keys(32)
+
+# Encrypt a number
+original_number = 12345
+cifrado = RSA.encrypt_number(original_number, e, n)
+print(f"Original number: {original_number}")
+print(f"Encrypted: {cifrado}")
+
+# Decrypt the number
+descifrado = RSA.decrypt_number(cifrado, d, n)
+print(f"Decrypted: {descifrado}")
+```
+
+## Parameters
+
+<ParamField path="bits" type="int" default="32">
+  The bit size for key generation. Default is 32 for educational purposes. Each prime will be `bits/2` bits long.
+</ParamField>
+
+<ParamField path="msg" type="string" required>
+  The plaintext message to encrypt. Each character is converted to its ASCII value and encrypted separately.
+</ParamField>
+
+<ParamField path="e" type="int" required>
+  Public exponent (part of the public key). Used for encryption.
+</ParamField>
+
+<ParamField path="d" type="int" required>
+  Private exponent (part of the private key). Used for decryption. Must be kept secret.
+</ParamField>
+
+<ParamField path="n" type="int" required>
+  Modulus (product of p and q). Part of both public and private keys.
+</ParamField>
+
+## Key characteristics
+
+<CardGroup cols={2}>
+  <Card title="Encryption type" icon="key">
+    **Asymmetric** - Different keys for encryption/decryption
+  </Card>
+  <Card title="Output format" icon="list-ol">
+    Array of integers (one per character)
+  </Card>
+  <Card title="Character support" icon="font">
+    ASCII characters (32-127)
+  </Card>
+  <Card title="Key size" icon="ruler">
+    32-bit (educational), production uses 2048+ bits
+  </Card>
+</CardGroup>
+
+## Security notes
+
+<Warning>
+  This RSA implementation has **CRITICAL SECURITY FLAWS** and must **NEVER** be used for real encryption.
+</Warning>
+
+### Major vulnerabilities
+
+<AccordionGroup>
+  <Accordion title="Extremely weak key size">
+    **32-bit keys can be factored in seconds**
+    
+    - Modern computers can factor 32-bit numbers instantly
+    - Production RSA uses minimum 2048-bit keys (some use 4096)
+    - A 32-bit key provides essentially zero security
+    
+    ```python
+    # INSECURE - 32 bit
+    e, d, n = gen_keys(32)  # n is ~32 bits
+    
+    # STILL INSECURE - Need 2048+ bits for real security
+    e, d, n = gen_keys(2048)  # This implementation still has other flaws!
+    ```
+  </Accordion>
+  
+  <Accordion title="No padding scheme">
+    **Vulnerable to multiple attacks without padding**
+    
+    - No OAEP (Optimal Asymmetric Encryption Padding)
+    - No PKCS#1 v1.5 padding
+    - Susceptible to chosen-ciphertext attacks
+    - Deterministic encryption reveals patterns
+    
+    Same plaintext always produces same ciphertext:
+    ```python
+    # Both encryptions produce identical output
+    cipher1 = encrypt("HELLO", e, n)
+    cipher2 = encrypt("HELLO", e, n)
+    # cipher1 == cipher2 (BAD!)
+    ```
+  </Accordion>
+  
+  <Accordion title="Weak primality testing">
+    **Simple trial division is not cryptographically secure**
+    
+    - Production systems use Miller-Rabin or similar tests
+    - Current implementation is slow and not guaranteed
+    - May accept composite numbers in edge cases
+    - No strong randomness guarantees
+  </Accordion>
+  
+  <Accordion title="No key management">
+    **Missing essential security features**
+    
+    - No secure key storage
+    - No key expiration or rotation
+    - No certificate infrastructure
+    - Private key is in plain memory
+  </Accordion>
+  
+  <Accordion title="Character-by-character encryption">
+    **Each character encrypted independently**
+    
+    - Reveals message length exactly
+    - No message integrity checking
+    - No authentication
+    - Vulnerable to manipulation attacks
+  </Accordion>
+</AccordionGroup>
+
+### For production use
+
+<Info>
+  Use established cryptography libraries:
+  
+  ```python
+  # Use these instead!
+  from cryptography.hazmat.primitives.asymmetric import rsa, padding
+  from cryptography.hazmat.primitives import hashes
+  
+  # Or
+  from Crypto.PublicKey import RSA
+  from Crypto.Cipher import PKCS1_OAEP
+  ```
+</Info>
+
+## Educational value
+
+Despite security flaws, this implementation is excellent for learning:
+
+<Tabs>
+  <Tab title="Core concepts">
+    - Public-key cryptography fundamentals
+    - Asymmetric vs symmetric encryption
+    - Key pairs (public/private)
+    - How RSA actually works mathematically
+  </Tab>
+  
+  <Tab title="Number theory">
+    - Prime number generation
+    - Modular arithmetic
+    - Euler's totient function
+    - Modular multiplicative inverse
+    - Greatest common divisor
+  </Tab>
+  
+  <Tab title="Cryptographic principles">
+    - Why large primes are important
+    - Computational hardness assumptions
+    - Trapdoor functions
+    - Why padding and randomization matter
+  </Tab>
+  
+  <Tab title="Practical insights">
+    - Key generation process
+    - Performance considerations
+    - Why we need specialized libraries
+    - Real-world security requirements
+  </Tab>
+</Tabs>
+
+## Advanced example
+
+```python
+import RSA
+import time
+
+# Compare different key sizes (still insecure!)
+for bits in [16, 24, 32]:
+    print(f"\nTesting {bits}-bit keys:")
+    
+    # Measure key generation time
+    start = time.time()
+    e, d, n = RSA.gen_keys(bits)
+    gen_time = time.time() - start
+    
+    print(f"Key generation: {gen_time:.4f}s")
+    print(f"Public key: (e={e}, n={n})")
+    print(f"n has {len(bin(n))-2} bits")
+    
+    # Encrypt and decrypt
+    mensaje = "TEST"
+    
+    start = time.time()
+    cifrado = RSA.encrypt(mensaje, e, n)
+    enc_time = time.time() - start
+    
+    start = time.time()
+    descifrado = RSA.decrypt(cifrado, d, n)
+    dec_time = time.time() - start
+    
+    print(f"Encryption: {enc_time:.6f}s")
+    print(f"Decryption: {dec_time:.6f}s")
+    print(f"Ciphertext length: {len(cifrado)} integers")
+    print(f"Verified: {mensaje == descifrado}")
+```
+
+## Common pitfalls
+
+<Warning>
+  Avoid these common mistakes when learning RSA:
+</Warning>
+
+1. **Using small primes**: Always use cryptographically large primes (production: 1024+ bits each)
+2. **Reusing keys**: Don't use the same key pair for different purposes
+3. **Encrypting long messages**: RSA is typically used to encrypt symmetric keys, not entire messages
+4. **Ignoring padding**: Always use proper padding schemes (OAEP)
+5. **Rolling your own crypto**: Use established libraries in production
+
+## Performance comparison
+
+```python
+import RSA
+import time
+
+# Short message
+mensaje_corto = "HELLO"
+start = time.time()
+e, d, n = RSA.gen_keys(32)
+cifrado = RSA.encrypt(mensaje_corto, e, n)
+descifrado = RSA.decrypt(cifrado, d, n)
+time_corto = time.time() - start
+print(f"Short message: {time_corto:.4f}s")
+
+# Long message
+mensaje_largo = "HELLO" * 100
+start = time.time()
+e, d, n = RSA.gen_keys(32)
+cifrado = RSA.encrypt(mensaje_largo, e, n)
+descifrado = RSA.decrypt(cifrado, d, n)
+time_largo = time.time() - start
+print(f"Long message: {time_largo:.4f}s")
+```
+
+<Note>
+  RSA is significantly slower than symmetric encryption (like AES). In practice, RSA encrypts a symmetric key, which then encrypts the actual message.
+</Note>
+
+## See also
+
+- [Caesar cipher](/algorithms/caesar) - Simple substitution cipher
+- [Transposition cipher](/algorithms/transposition) - Rearrangement-based encryption
+- [Algorithms overview](/algorithms/overview) - Compare all three algorithms

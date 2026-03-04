@@ -1,0 +1,167 @@
+---
+title: Contributing
+description: Learn how to contribute to the Algoritmos de Encriptamiento project
+---
+
+## Welcome contributors
+
+Thank you for your interest in contributing to Algoritmos de Encriptamiento! This project welcomes contributions from developers of all skill levels who want to help improve this educational cryptography tool.
+
+## Getting started
+
+<Steps>
+  <Step title="Fork the repository">
+    Start by forking the [Algoritmos de Encriptamiento repository](https://github.com/RennfahrerU/Algoritmos-de-Encriptamiento) to your own GitHub account.
+  </Step>
+  
+  <Step title="Clone your fork">
+    Clone your forked repository to your local machine:
+    ```bash
+    git clone https://github.com/your-username/Algoritmos-de-Encriptamiento.git
+    cd Algoritmos-de-Encriptamiento
+    ```
+  </Step>
+  
+  <Step title="Set up the development environment">
+    Install the required dependencies using Pipenv:
+    ```bash
+    pip install pipenv
+    pipenv install
+    ```
+  </Step>
+  
+  <Step title="Create a feature branch">
+    Create a new branch for your changes:
+    ```bash
+    git checkout -b mi-nueva-funcion
+    ```
+    Use a descriptive name that reflects the changes you're making.
+  </Step>
+</Steps>
+
+## Making changes
+
+### Code style
+
+When contributing code to this project:
+
+- Follow Python PEP 8 style guidelines
+- Use meaningful variable and function names
+- Add comments to explain complex logic
+- Keep functions focused and modular
+- Maintain consistency with the existing codebase
+
+### Testing your changes
+
+Before submitting your contribution, make sure to test both interfaces:
+
+**Web interface:**
+```bash
+pipenv run python app.py
+```
+Test your changes at [http://localhost:5000](http://localhost:5000)
+
+**Console interface:**
+```bash
+pipenv run python main.py
+```
+Verify that the console output works as expected.
+
+<Note>
+  Test all three algorithms (Caesar cipher, Transposition, and RSA) to ensure your changes don't break existing functionality.
+</Note>
+
+## Submitting your contribution
+
+<Steps>
+  <Step title="Commit your changes">
+    Commit your changes with a clear, descriptive message:
+    ```bash
+    git add .
+    git commit -m "Agregué algo cool"
+    ```
+    Write commit messages that explain what you changed and why.
+  </Step>
+  
+  <Step title="Push to your fork">
+    Push your branch to your forked repository:
+    ```bash
+    git push origin mi-nueva-funcion
+    ```
+  </Step>
+  
+  <Step title="Open a pull request">
+    Go to the [original repository](https://github.com/RennfahrerU/Algoritmos-de-Encriptamiento) and open a pull request from your branch.
+    
+    In your pull request description:
+    - Explain what changes you made
+    - Describe why these changes are beneficial
+    - Mention any related issues
+    - Include screenshots if you modified the UI
+  </Step>
+  
+  <Step title="Respond to feedback">
+    The maintainers may request changes or ask questions. Be responsive and willing to iterate on your contribution.
+  </Step>
+</Steps>
+
+## Types of contributions
+
+There are many ways to contribute to this project:
+
+### Code improvements
+
+- Add new encryption algorithms (educational implementations)
+- Improve the user interface (web or console)
+- Enhance error handling and input validation
+- Add support for more character sets or languages
+- Optimize algorithm performance
+
+### Documentation
+
+- Improve code comments and docstrings
+- Fix typos or unclear explanations
+- Add examples and tutorials
+- Translate documentation to other languages
+
+### Bug reports
+
+- Report issues you find when using the application
+- Provide detailed steps to reproduce problems
+- Include information about your environment (OS, Python version)
+
+### Feature requests
+
+- Suggest new features or improvements
+- Explain the use case and benefits
+- Discuss your ideas in GitHub issues before implementing
+
+<Warning>
+  Remember that this is an **educational project**. Contributions should focus on learning and demonstration purposes, not production-grade security.
+</Warning>
+
+## Code of conduct
+
+When contributing to this project:
+
+- Be respectful and inclusive
+- Welcome newcomers and help them learn
+- Provide constructive feedback
+- Focus on what is best for the educational community
+- Show empathy towards other contributors
+
+## License
+
+By contributing to Algoritmos de Encriptamiento, you agree that your contributions will be licensed under the MIT License. See the [LICENSE](https://github.com/RennfahrerU/Algoritmos-de-Encriptamiento/blob/main/LICENSE) file for details.
+
+## Questions?
+
+If you have questions about contributing, feel free to:
+
+- Open an issue on [GitHub](https://github.com/RennfahrerU/Algoritmos-de-Encriptamiento/issues)
+- Review existing issues and pull requests to see how others contribute
+- Start with small contributions to get familiar with the project
+
+## Acknowledgments
+
+This project was created by **Yilver Rivera** and is maintained with the help of contributors like you. Thank you for helping make this educational resource better!

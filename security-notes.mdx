@@ -1,0 +1,92 @@
+---
+title: Security notes
+description: Important security warnings and limitations of this educational cryptography tool
+---
+
+<Warning>
+  **This project is for educational purposes only.** Do not use this implementation for any real-world security applications or to protect sensitive data.
+</Warning>
+
+## Educational tool only
+
+Algoritmos de Encriptamiento is designed as a learning resource to understand how classic encryption algorithms work. It is **not suitable for production use** and should never be used to protect real data.
+
+## Known security limitations
+
+### RSA implementation weaknesses
+
+The RSA implementation in this project has several critical security issues:
+
+- **32-bit keys**: The default RSA key size is only 32 bits, which is extremely weak. Modern secure RSA implementations use at least 2048 bits, with 4096 bits recommended for high-security applications.
+- **No padding scheme**: This implementation does not use any padding scheme like OAEP (Optimal Asymmetric Encryption Padding), making it vulnerable to various attacks.
+- **Small prime numbers**: The use of small primes for key generation makes the encryption trivially breakable with modern computing power.
+- **No key management**: There are no secure key storage or key management practices implemented.
+
+### Caesar cipher vulnerabilities
+
+The Caesar cipher (implemented in `sustitucion.py`) is one of the weakest encryption methods:
+
+- **Frequency analysis**: Can be easily broken using letter frequency analysis, especially for longer texts.
+- **Limited keyspace**: With only 27 possible shifts (including Ñ in the Spanish alphabet), brute force attacks are trivial.
+- **Pattern preservation**: The cipher preserves patterns in the original text, making it vulnerable to known-plaintext attacks.
+
+### Transposition cipher weaknesses
+
+The transposition cipher has its own set of vulnerabilities:
+
+- **Pattern analysis**: Can be broken with anagramming techniques and pattern recognition.
+- **Predictable padding**: Uses asterisks (*) for padding, which reveals information about message length.
+- **No diffusion**: Does not change the actual characters, only their positions.
+
+## Missing security features
+
+This implementation lacks many features required for secure cryptography:
+
+<Steps>
+  <Step title="No salt or initialization vectors">
+    The algorithms do not use random salts or IVs, making identical plaintext produce identical ciphertext.
+  </Step>
+  
+  <Step title="No authentication">
+    There is no message authentication code (MAC) or digital signature to verify message integrity.
+  </Step>
+  
+  <Step title="No secure random number generation">
+    Random number generation is not cryptographically secure.
+  </Step>
+  
+  <Step title="No protection against timing attacks">
+    The implementation does not protect against side-channel attacks like timing analysis.
+  </Step>
+</Steps>
+
+## What to use instead
+
+For real-world cryptography needs, use well-tested and maintained libraries:
+
+<Note>
+  **Recommended libraries for Python:**
+  - [`cryptography`](https://cryptography.io/) - A comprehensive cryptography library
+  - [`pycryptodome`](https://www.pycryptodome.org/) - A self-contained Python package of low-level cryptographic primitives
+  - [`PyNaCl`](https://pynacl.readthedocs.io/) - Python binding to libsodium, a modern easy-to-use crypto library
+</Note>
+
+These libraries:
+- Use industry-standard algorithms with secure defaults
+- Are regularly audited and updated
+- Implement proper padding, key management, and random number generation
+- Provide protection against common cryptographic attacks
+
+## Learning resources
+
+While this project is not secure for production, it can help you understand cryptographic concepts. To learn more about real cryptography:
+
+- Study the mathematics behind modern encryption algorithms
+- Learn about block cipher modes of operation
+- Understand the importance of key management and secure key exchange
+- Research common cryptographic attacks and how modern systems prevent them
+- Practice with established libraries before implementing your own solutions
+
+<Warning>
+  **Never roll your own crypto for production use.** Even experienced cryptographers make mistakes. Always use established, peer-reviewed cryptographic libraries for real applications.
+</Warning>

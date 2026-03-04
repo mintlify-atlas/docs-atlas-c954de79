@@ -1,0 +1,81 @@
+---
+title: Introduction
+description: Learn classical cryptography with an educational Python tool featuring Caesar cipher, Transposition cipher, and RSA encryption
+---
+
+# Welcome to Algoritmos de Encriptamiento
+
+Algoritmos de Encriptamiento is an educational Python project that implements three classical encryption algorithms with both a web interface and CLI. Perfect for learning cryptography fundamentals or experimenting with encryption techniques.
+
+<Note>
+This project is designed for **educational purposes only**. The implementations (especially 32-bit RSA) are not secure for production use.
+</Note>
+
+## Why use this tool?
+
+<CardGroup cols={2}>
+  <Card title="Learn by doing" icon="graduation-cap">
+    Understand how classical encryption algorithms work by encrypting and decrypting your own messages
+  </Card>
+  <Card title="Multiple algorithms" icon="key">
+    Experiment with Caesar cipher, Transposition cipher, and RSA encryption in one place
+  </Card>
+  <Card title="Dual interface" icon="window">
+    Choose between an intuitive web interface or a command-line tool based on your preference
+  </Card>
+  <Card title="Spanish alphabet support" icon="language">
+    Full support for the Spanish alphabet including the "Ñ" character
+  </Card>
+</CardGroup>
+
+## Encryption algorithms included
+
+### Caesar cipher (Substitution)
+
+A simple algorithm that shifts letters in the alphabet by a fixed number of positions. By default, this implementation uses a shift of 8 positions.
+
+**Use case**: Introduction to substitution ciphers and frequency analysis vulnerabilities.
+
+### Transposition cipher
+
+Reorganizes message letters according to a numeric key by arranging them in a matrix. The default implementation uses 5 columns.
+
+**Use case**: Understanding how transposition differs from substitution and how matrix-based encryption works.
+
+### RSA encryption
+
+Famous asymmetric cryptography algorithm that uses large prime numbers to protect messages. This implementation generates keys automatically with configurable bit length (default 32 bits).
+
+**Use case**: Learning public-key cryptography fundamentals and the mathematics behind RSA.
+
+## How it works
+
+You can encrypt and decrypt messages using:
+
+- **Web interface**: A Flask-based GUI where you select the algorithm, enter your message, and choose to encrypt or decrypt
+- **CLI**: A terminal-based tool that applies all three algorithms to your message automatically
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Set up the project with Python and pipenv
+  </Card>
+  <Card title="Quick start" icon="rocket" href="/quickstart">
+    Start encrypting messages in minutes
+  </Card>
+</CardGroup>
+
+## Security notice
+
+<Warning>
+The algorithms implemented here are **not secure** for real-world use:
+
+- Caesar and Transposition ciphers are easily broken with frequency analysis
+- 32-bit RSA keys are extremely weak compared to industry standards (2048+ bits)
+- No advanced techniques like padding or salt are used
+
+For production cryptography, use proven libraries like `cryptography` or `pycryptodome`.
+</Warning>
+
+## What's next?
+
+Ready to get started? Head to the [installation guide](/installation) to set up your environment, then jump into the [quick start](/quickstart) to encrypt your first message.

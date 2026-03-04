@@ -1,0 +1,361 @@
+---
+title: Using the command-line interface
+description: Learn how to encrypt and decrypt messages using the CLI application
+---
+
+The command-line interface (CLI) provides a quick way to test all three encryption algorithms at once. This guide covers how to use `main.py` for encryption operations.
+
+## Running the CLI
+
+<Steps>
+  <Step title="Activate the environment">
+    First, activate the Pipenv virtual environment:
+    
+    ```bash
+    pipenv shell
+    ```
+  </Step>
+  
+  <Step title="Run the main script">
+    Execute the CLI application:
+    
+    ```bash
+    python main.py
+    ```
+  </Step>
+  
+  <Step title="Enter your message">
+    When prompted, type your message:
+    
+    ```
+    Ingrese el mensaje a operar: HOLA MUNDO
+    ```
+  </Step>
+</Steps>
+
+The program will automatically encrypt and decrypt your message using all three algorithms.
+
+## Understanding the output
+
+The CLI processes your message through all three algorithms sequentially:
+
+### Example session
+
+```bash
+$ python main.py
+Ingrese el mensaje a operar: HOLA MUNDO
+Mensaje original: HOLA MUNDO
+
+# Sustitución (César)
+Mensaje cifrado: OWSITCULW
+Mensaje descifrado: HOLAMUNDO
+
+# Transposición
+Mensaje cifrado: HUONLDAOM*
+Mensaje descifrado: HOLAMUNDO
+
+# RSA
+Mensaje cifrado: [210781516, 270112935, 1336237868, 270112935, 1025793116, 270112935, 1508442393, 1508442393, 1025793116]
+Mensaje descifrado: HOLA MUNDO
+```
+
+## Algorithm processing flow
+
+The CLI follows this execution order defined in `main.py:6-25`:
+
+<Steps>
+  <Step title="Sustitución (César)">
+    **Parameters:**
+    - Shift position: `8`
+    
+    **Process:**
+    1. Converts message to numbers
+    2. Shifts each number by 8 positions
+    3. Converts back to letters
+    4. Displays encrypted and decrypted results
+    
+    **Code:**
+    ```python
+    pos = 8
+    susti_des = sustitucion_cifrar(mensaje, pos)
+    sustitucion_descifrar(susti_des, pos)
+    ```
+  </Step>
+  
+  <Step title="Transposición">
+    **Parameters:**
+    - Key (columns): `5`
+    
+    **Process:**
+    1. Arranges message in a matrix with 5 columns
+    2. Reads by columns to create ciphertext
+    3. Reverses the process to decrypt
+    4. Displays encrypted and decrypted results
+    
+    **Code:**
+    ```python
+    clave = 5
+    transp_descifrar = transposicion_cifrar(mensaje, clave)
+    transposicion_descifrar(transp_descifrar, clave)
+    ```
+  </Step>
+  
+  <Step title="RSA">
+    **Parameters:**
+    - Key size: `32 bits`
+    
+    **Process:**
+    1. Generates RSA key pair (e, d, n)
+    2. Encrypts message using public key (e, n)
+    3. Decrypts using private key (d, n)
+    4. Displays keys, encrypted list, and decrypted message
+    
+    **Code:**
+    ```python
+    bits = 32
+    e, d, n = RSA.gen_keys(bits)
+    mensaje_cifrado = RSA_cifrar(mensaje, e, n)
+    RSA_descifrar(mensaje_cifrado, d, n)
+    ```
+  </Step>
+</Steps>
+
+## Detailed algorithm usage
+
+<Tabs>
+  <Tab title="Sustitución">
+    The Caesar cipher implementation shifts letters in the Spanish alphabet (including Ñ).
+    
+    ### How it works
+    
+    ```python
+    # Encrypt
+    def sustitucion_cifrar(mensaje, pos):
+        cifrado = sustitucion.convertiraNumero(mensaje)
+        cifrado = sustitucion.cifrar(cifrado, pos)
+        mensajecifrado = sustitucion.convertiraLetra(cifrado)
+        util.printResultado("cifrado", mensajecifrado)
+        return mensajecifrado
+    
+    # Decrypt
+    def sustitucion_descifrar(mensaje_cifrado, pos):
+        mensaje_cifrado = sustitucion.convertiraNumero(mensaje_cifrado)
+        descifrado = sustitucion.descifrar(mensaje_cifrado, pos)
+        mensajedescifrado = sustitucion.convertiraLetra(descifrado)
+        util.printResultado("descifrado", mensajedescifrado)
+        return mensajedescifrado
+    ```
+    
+    ### Key features
+    - Supports Spanish alphabet with Ñ
+    - Default shift: 8 positions
+    - Removes spaces from output
+    - Case-insensitive processing
+    
+    ### Example transformations
+    
+    | Input | Shift | Output |
+    |-------|-------|--------|
+    | HOLA  | 8     | OWSI   |
+    | ABC   | 8     | IJK    |
+    | XYZ   | 8     | FGH    |
+  </Tab>
+  
+  <Tab title="Transposición">
+    The transposition cipher rearranges characters in a columnar fashion.
+    
+    ### How it works
+    
+    ```python
+    # Encrypt
+    def transposicion_cifrar(mensaje, clave):
+        cifrado = transposicion.cifrar(mensaje, clave)
+        util.printResultado("cifrado", cifrado)
+        return cifrado
+    
+    # Decrypt
+    def transposicion_descifrar(mensaje, clave):
+        descifrado = transposicion.descifrar(mensaje, clave)
+        util.printResultado("descifrado", descifrado)
+    ```
+    
+    ### Key features
+    - Default key: 5 columns
+    - Adds `*` padding when needed
+    - Preserves character positions relatively
+    
+    ### Example with key=5
+    
+    **Input:** `HOLA MUNDO` (10 characters)
+    
+    **Matrix arrangement:**
+    ```
+    H O L A   
+    M U N D O
+    ```
+    
+    **Read by columns:** `HUONLDAOM*`
+    
+    <Info>
+      The key determines how many columns the matrix has. A larger key means more columns and a different transposition pattern.
+    </Info>
+  </Tab>
+  
+  <Tab title="RSA">
+    RSA encryption uses public-key cryptography with automatically generated keys.
+    
+    ### How it works
+    
+    ```python
+    # Generate keys
+    bits = 32
+    e, d, n = RSA.gen_keys(bits)
+    
+    # Encrypt
+    def RSA_cifrar(mensaje, e, n):
+        mensaje_cifrado = RSA.encrypt(mensaje, e, n)
+        print(f"Mensaje cifrado: {mensaje_cifrado}")
+        return mensaje_cifrado
+    
+    # Decrypt
+    def RSA_descifrar(mensaje_cifrado, d, n):
+        mensaje_descifrado = RSA.decrypt(mensaje_cifrado, d, n)
+        if mensaje_descifrado is not None:
+            print(f"Mensaje descifrado: {mensaje_descifrado}")
+        else:
+            print("Error al descifrar el mensaje.")
+    ```
+    
+    ### Key components
+    
+    - **e (public exponent)**: Used for encryption
+    - **d (private exponent)**: Used for decryption
+    - **n (modulus)**: Product of two prime numbers
+    - **bits**: Key size (default: 32 for demo purposes)
+    
+    ### Output format
+    
+    RSA outputs a list of encrypted integers:
+    
+    ```python
+    [210781516, 270112935, 1336237868, 270112935, 1025793116]
+    ```
+    
+    Each number represents an encrypted character from the original message.
+    
+    <Warning>
+      32-bit keys are extremely weak and only suitable for educational purposes. Real-world RSA uses 2048-bit or 4096-bit keys.
+    </Warning>
+  </Tab>
+</Tabs>
+
+## Customizing parameters
+
+You can modify the algorithm parameters by editing `main.py`:
+
+<CodeGroup>
+```python Changing Caesar shift
+# Change from shift=8 to shift=13 (ROT13)
+pos = 13  # Line 11
+susti_des = sustitucion_cifrar(mensaje, pos)
+sustitucion_descifrar(susti_des, pos)
+```
+
+```python Changing transposition key
+# Change from 5 columns to 7 columns
+clave = 7  # Line 16
+transp_descifrar = transposicion_cifrar(mensaje, clave)
+transposicion_descifrar(transp_descifrar, clave)
+```
+
+```python Changing RSA key size
+# Change from 32-bit to 64-bit keys
+bits = 64  # Line 22
+e, d, n = RSA.gen_keys(bits)
+mensaje_cifrado = RSA_cifrar(mensaje, e, n)
+RSA_descifrar(mensaje_cifrado, d, n)
+```
+</CodeGroup>
+
+## Using individual algorithms
+
+If you want to use only one algorithm instead of running all three, you can import and use the functions directly:
+
+<CodeGroup>
+```python Caesar only
+import sustitucion
+import util
+
+mensaje = "HOLA MUNDO"
+pos = 8
+
+# Encrypt
+cifrado = sustitucion.convertiraNumero(mensaje)
+cifrado = sustitucion.cifrar(cifrado, pos)
+mensajecifrado = sustitucion.convertiraLetra(cifrado)
+print(f"Cifrado: {mensajecifrado}")
+
+# Decrypt
+numeros = sustitucion.convertiraNumero(mensajecifrado)
+descifrado = sustitucion.descifrar(numeros, pos)
+mensajedescifrado = sustitucion.convertiraLetra(descifrado)
+print(f"Descifrado: {mensajedescifrado}")
+```
+
+```python Transposition only
+import transposicion
+
+mensaje = "HOLA MUNDO"
+clave = 5
+
+# Encrypt
+cifrado = transposicion.cifrar(mensaje, clave)
+print(f"Cifrado: {cifrado}")
+
+# Decrypt
+descifrado = transposicion.descifrar(cifrado, clave)
+print(f"Descifrado: {descifrado}")
+```
+
+```python RSA only
+import RSA
+
+mensaje = "HOLA MUNDO"
+bits = 32
+
+# Generate keys
+e, d, n = RSA.gen_keys(bits)
+print(f"Claves: e={e}, d={d}, n={n}")
+
+# Encrypt
+mensaje_cifrado = RSA.encrypt(mensaje, e, n)
+print(f"Cifrado: {mensaje_cifrado}")
+
+# Decrypt
+mensaje_descifrado = RSA.decrypt(mensaje_cifrado, d, n)
+print(f"Descifrado: {mensaje_descifrado}")
+```
+</CodeGroup>
+
+## Command output formatting
+
+The CLI uses utility functions from `util.py` to format output consistently:
+
+```python
+util.printResultado("cifrado", mensajecifrado)
+util.printResultado("descifrado", mensajedescifrado)
+```
+
+This ensures all algorithm outputs follow the same format for easy comparison.
+
+## Error handling
+
+The CLI includes basic error handling:
+
+- **RSA decryption errors**: Returns `None` and prints error message
+- **Invalid input**: Handled by individual algorithm modules
+- **Empty messages**: Processed but may produce unexpected results
+
+<Note>
+  The CLI is designed for quick testing and demonstration. For production use, implement more robust error handling and input validation.
+</Note>

@@ -1,0 +1,192 @@
+---
+title: Substitution cipher module
+description: Caesar cipher implementation for encrypting and decrypting messages using alphabetic substitution
+---
+
+The `sustitucion` module implements a Caesar cipher algorithm that shifts letters in the Spanish alphabet (including Ñ) by a specified position.
+
+## convertiraNumero
+
+Converts a message string into a list of numeric values based on the Spanish alphabet.
+
+```python
+def convertiraNumero(mensaje)
+```
+
+<ParamField path="mensaje" type="str" required>
+  The message to convert. Letters are automatically converted to uppercase. Non-alphabetic characters are ignored.
+</ParamField>
+
+<ResponseField name="return" type="list[int]">
+  A list of integers representing each letter's position in the alphabet (0-26). Ñ is position 14.
+</ResponseField>
+
+<Note>
+  The Spanish alphabet mapping includes Ñ at position 14, making the total alphabet size 27 characters (A=0 through Z=26).
+</Note>
+
+### Example
+
+```python
+import sustitucion
+
+mensaje = "HOLA"
+numeros = sustitucion.convertiraNumero(mensaje)
+print(numeros)  # Output: [7, 15, 11, 0]
+```
+
+## cifrar
+
+Encrypts a list of numeric values by shifting each number by a specified position using modular arithmetic.
+
+```python
+def cifrar(cifrado, pos)
+```
+
+<ParamField path="cifrado" type="list[int]" required>
+  A list of numeric values to encrypt (typically from `convertiraNumero`).
+</ParamField>
+
+<ParamField path="pos" type="int" required>
+  The number of positions to shift each letter forward in the alphabet (the encryption key).
+</ParamField>
+
+<ResponseField name="return" type="list[int]">
+  The encrypted list with each value shifted by `pos` modulo 27.
+</ResponseField>
+
+### Example
+
+```python
+import sustitucion
+
+mensaje = "HOLA"
+pos = 8
+
+# Convert to numbers
+cifrado = sustitucion.convertiraNumero(mensaje)
+
+# Encrypt
+cifrado = sustitucion.cifrar(cifrado, pos)
+print(cifrado)  # Shifted values
+```
+
+## descifrar
+
+Decrypts a list of encrypted numeric values by shifting each number backwards by the specified position.
+
+```python
+def descifrar(cifrado, pos)
+```
+
+<ParamField path="cifrado" type="list[int]" required>
+  A list of encrypted numeric values to decrypt.
+</ParamField>
+
+<ParamField path="pos" type="int" required>
+  The number of positions to shift each letter backwards in the alphabet (must match the encryption key).
+</ParamField>
+
+<ResponseField name="return" type="list[int]">
+  The decrypted list with each value shifted backwards by `pos` modulo 27.
+</ResponseField>
+
+### Example
+
+```python
+import sustitucion
+
+mensaje_cifrado = "PWTM"
+pos = 8
+
+# Convert to numbers
+numeros = sustitucion.convertiraNumero(mensaje_cifrado)
+
+# Decrypt
+descifrado = sustitucion.descifrar(numeros, pos)
+print(descifrado)  # Original numeric values
+```
+
+## convertiraLetra
+
+Converts a list of numeric values back into a string of letters.
+
+```python
+def convertiraLetra(cifrado)
+```
+
+<ParamField path="cifrado" type="list[int]" required>
+  A list of integers representing alphabet positions (0-26) to convert back to letters.
+</ParamField>
+
+<ResponseField name="return" type="str">
+  The string representation of the numeric values.
+</ResponseField>
+
+### Example
+
+```python
+import sustitucion
+
+numeros = [7, 15, 11, 0]
+mensaje = sustitucion.convertiraLetra(numeros)
+print(mensaje)  # Output: "HOLA"
+```
+
+## Complete encryption workflow
+
+Here's a complete example showing how to encrypt and decrypt a message:
+
+<CodeGroup>
+
+```python Encrypt a message
+import sustitucion
+
+mensaje = "HOLA MUNDO"
+pos = 8
+
+# Step 1: Convert message to numbers
+cifrado = sustitucion.convertiraNumero(mensaje)
+
+# Step 2: Encrypt the numbers
+cifrado = sustitucion.cifrar(cifrado, pos)
+
+# Step 3: Convert back to letters
+mensaje_cifrado = sustitucion.convertiraLetra(cifrado)
+print(f"Encrypted: {mensaje_cifrado}")
+```
+
+```python Decrypt a message
+import sustitucion
+
+mensaje_cifrado = "PWTMAÑWLW"
+pos = 8
+
+# Step 1: Convert encrypted message to numbers
+numeros = sustitucion.convertiraNumero(mensaje_cifrado)
+
+# Step 2: Decrypt the numbers
+descifrado = sustitucion.descifrar(numeros, pos)
+
+# Step 3: Convert back to letters
+mensaje_descifrado = sustitucion.convertiraLetra(descifrado)
+print(f"Decrypted: {mensaje_descifrado}")
+```
+
+</CodeGroup>
+
+## Alphabet reference
+
+The module uses the following Spanish alphabet mapping:
+
+| Letter | Value | Letter | Value | Letter | Value |
+|--------|-------|--------|-------|--------|-------|
+| A      | 0     | J      | 9     | S      | 19    |
+| B      | 1     | K      | 10    | T      | 20    |
+| C      | 2     | L      | 11    | U      | 21    |
+| D      | 3     | M      | 12    | V      | 22    |
+| E      | 4     | N      | 13    | W      | 23    |
+| F      | 5     | Ñ      | 14    | X      | 24    |
+| G      | 6     | O      | 15    | Y      | 25    |
+| H      | 7     | P      | 16    | Z      | 26    |
+| I      | 8     | Q      | 17    |        |       |

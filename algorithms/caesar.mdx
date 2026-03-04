@@ -1,0 +1,245 @@
+---
+title: Caesar cipher
+description: Documentation for the Caesar substitution cipher implementation with Spanish alphabet support
+---
+
+The Caesar cipher is a simple substitution cipher that shifts each letter in the message by a fixed number of positions in the alphabet. This implementation supports the Spanish alphabet including the Ñ character.
+
+## How it works
+
+The Caesar cipher uses **modular arithmetic** to shift letters:
+
+1. Convert each letter to a number (A=0, B=1, ..., Z=26)
+2. Add the shift value to each number
+3. Apply modulo 27 to wrap around the alphabet
+4. Convert numbers back to letters
+
+<Note>
+  This implementation uses 27 characters (A-Z plus Ñ) instead of the traditional 26-letter English alphabet.
+</Note>
+
+## Algorithm explanation
+
+### Encryption formula
+
+```
+E(x) = (x + shift) mod 27
+```
+
+Where:
+- `x` is the numeric position of the plaintext letter (0-26)
+- `shift` is the key (default: 8)
+- `E(x)` is the encrypted letter position
+
+### Decryption formula
+
+```
+D(x) = (x - shift) mod 27
+```
+
+## Implementation details
+
+The implementation is in `sustitucion.py` and consists of four main functions:
+
+### Alphabet mapping
+
+```python
+abecedario = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5, 'G': 6, 'H': 7, 'I': 8, 'J': 9, 'K': 10, 'L': 11, 'M': 12,
+              'N': 13, 'Ñ': 14, 'O': 15, 'P': 16, 'Q': 17, 'R': 18, 'S': 19, 'T': 20, 'U': 21, 'V': 22, 'W': 23, 'X': 24, 'Y': 25, 'Z': 26}
+
+abecedario_inverso = {valor: clave for clave, valor in abecedario.items()}
+```
+
+### Core functions
+
+<CodeGroup>
+
+```python Text to numbers
+def convertiraNumero(mensaje):
+    cifrado = []
+    for letra in mensaje.upper():
+        if letra in abecedario:
+            cifrado.append(abecedario[letra])
+    return cifrado
+```
+
+```python Encryption
+def cifrar(cifrado, pos):
+    for i in range(len(cifrado)):
+        cifrado[i] = (cifrado[i] + pos) % 27
+    return cifrado
+```
+
+```python Decryption
+def descifrar(cifrado, pos):
+    for i in range(len(cifrado)):
+        cifrado[i] = (cifrado[i] - pos) % 27
+    return cifrado
+```
+
+```python Numbers to text
+def convertiraLetra(cifrado):
+    mensajecifrado = ''
+    for numero in cifrado:
+        mensajecifrado += abecedario_inverso[numero]
+    return mensajecifrado
+```
+
+</CodeGroup>
+
+## Usage example
+
+### Basic encryption and decryption
+
+```python
+from sustitucion import convertiraNumero, cifrar, descifrar, convertiraLetra
+
+# Original message
+mensaje = "HOLA"
+
+# Shift value (key)
+desplazamiento = 8
+
+# Encryption process
+numeros = convertiraNumero(mensaje)  # [7, 15, 11, 0]
+cifrado = cifrar(numeros, desplazamiento)  # [15, 23, 19, 8]
+mensaje_cifrado = convertiraLetra(cifrado)  # "OWSI"
+
+print(f"Original: {mensaje}")
+print(f"Encrypted: {mensaje_cifrado}")
+
+# Decryption process
+numeros_cifrados = convertiraNumero(mensaje_cifrado)
+descifrado = descifrar(numeros_cifrados, desplazamiento)
+mensaje_descifrado = convertiraLetra(descifrado)
+
+print(f"Decrypted: {mensaje_descifrado}")  # "HOLA"
+```
+
+### Step-by-step example
+
+<Steps>
+  <Step title="Convert message to numbers">
+    ```python
+    mensaje = "HOLA"
+    numeros = convertiraNumero(mensaje)
+    # Result: [7, 15, 11, 0]
+    # H=7, O=15, L=11, A=0
+    ```
+  </Step>
+  
+  <Step title="Apply shift encryption">
+    ```python
+    desplazamiento = 8
+    cifrado = cifrar(numeros, desplazamiento)
+    # Result: [15, 23, 19, 8]
+    # (7+8)%27=15, (15+8)%27=23, (11+8)%27=19, (0+8)%27=8
+    ```
+  </Step>
+  
+  <Step title="Convert back to letters">
+    ```python
+    mensaje_cifrado = convertiraLetra(cifrado)
+    # Result: "OWSI"
+    # 15=O, 23=W, 19=S, 8=I
+    ```
+  </Step>
+</Steps>
+
+## Parameters
+
+<ParamField path="mensaje" type="string" required>
+  The plaintext message to encrypt. Only letters A-Z and Ñ are processed; other characters are ignored.
+</ParamField>
+
+<ParamField path="pos" type="int" default="8">
+  The shift value (key). Can be any integer from 0 to 26. Values outside this range work but are equivalent to `pos % 27`.
+</ParamField>
+
+## Key characteristics
+
+<CardGroup cols={2}>
+  <Card title="Total possible keys" icon="key">
+    Only **27 different keys** (0-26)
+  </Card>
+  <Card title="Character handling" icon="language">
+    Converts to uppercase and ignores non-alphabetic characters
+  </Card>
+  <Card title="Alphabet size" icon="hashtag">
+    **27 characters** including Ñ
+  </Card>
+  <Card title="Encryption speed" icon="bolt">
+    O(n) linear time complexity
+  </Card>
+</CardGroup>
+
+## Security notes
+
+<Warning>
+  The Caesar cipher is **extremely insecure** and trivial to break. Never use it for protecting real data.
+</Warning>
+
+### Vulnerabilities
+
+1. **Brute force attack**: With only 27 possible keys, an attacker can try all combinations in seconds
+2. **Frequency analysis**: Letter frequency patterns are preserved, making cryptanalysis easy
+3. **Known-plaintext attack**: If any part of the plaintext is known, the key is immediately revealed
+4. **No key management**: The shift value must be securely shared between parties
+
+### Educational value
+
+<Info>
+  Despite its weaknesses, the Caesar cipher is excellent for learning:
+  - Basic encryption principles
+  - Modular arithmetic
+  - Why simple substitution is insufficient
+  - How frequency analysis works
+</Info>
+
+## Example with Spanish characters
+
+```python
+# Message with Ñ character
+mensaje = "ESPAÑA"
+numeros = convertiraNumero(mensaje)  # [4, 19, 16, 0, 14, 0]
+# E=4, S=19, P=16, A=0, Ñ=14, A=0
+
+# Encrypt with shift of 5
+cifrado = cifrar(numeros.copy(), 5)  # [9, 24, 21, 5, 19, 5]
+mensaje_cifrado = convertiraLetra(cifrado)  # "JYUFSE"
+
+# Decrypt
+descifrado = descifrar(cifrado.copy(), 5)  # [4, 19, 16, 0, 14, 0]
+mensaje_original = convertiraLetra(descifrado)  # "ESPAÑA"
+```
+
+## Common use cases
+
+<Tabs>
+  <Tab title="Educational">
+    - Teaching basic cryptography concepts
+    - Demonstrating substitution ciphers
+    - Learning modular arithmetic
+    - Understanding cipher weaknesses
+  </Tab>
+  
+  <Tab title="Historical">
+    - Understanding ancient encryption methods
+    - Studying historical cryptography
+    - ROT13 variant for text obfuscation
+    - Classical cipher analysis
+  </Tab>
+  
+  <Tab title="Recreational">
+    - Puzzle creation
+    - Simple message obfuscation
+    - Educational games
+    - Cryptography demonstrations
+  </Tab>
+</Tabs>
+
+## See also
+
+- [Transposition cipher](/algorithms/transposition) - Different approach using rearrangement
+- [RSA encryption](/algorithms/rsa) - Modern asymmetric encryption
+- [Algorithms overview](/algorithms/overview) - Compare all three algorithms

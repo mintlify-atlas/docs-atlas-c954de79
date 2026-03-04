@@ -1,0 +1,187 @@
+---
+title: FAQ
+description: Frequently asked questions about Algoritmos de Encriptamiento
+---
+
+## General questions
+
+<Accordion title="What is Algoritmos de Encriptamiento?">
+  Algoritmos de Encriptamiento is an educational Python project that implements three classic encryption algorithms: Caesar cipher, Transposition cipher, and RSA. It includes both a Flask web interface and a command-line interface to help users learn how these cryptographic algorithms work.
+</Accordion>
+
+<Accordion title="Is this tool safe to use for protecting sensitive data?">
+  **No.** This project is designed purely for educational purposes. The implementations use weak security parameters (like 32-bit RSA keys) and lack essential security features like padding, salt, and secure random number generation. Never use this tool to encrypt real sensitive data. Use established libraries like `cryptography` or `pycryptodome` instead.
+</Accordion>
+
+<Accordion title="What programming language is this written in?">
+  The project is written in **Python 3.6+** and uses Flask for the web interface. Dependencies are managed using Pipenv.
+</Accordion>
+
+<Accordion title="Who created this project?">
+  This project was created by **Yilver Rivera** as an educational resource for learning about cryptography algorithms.
+</Accordion>
+
+## Installation and setup
+
+<Accordion title="What are the system requirements?">
+  You need:
+  - Python 3.6 or higher
+  - pip (Python package manager)
+  - Pipenv (for dependency management)
+  
+  The project works on Windows, macOS, and Linux.
+</Accordion>
+
+<Accordion title="How do I install the project?">
+  Follow these steps:
+  
+  1. Clone the repository:
+     ```bash
+     git clone https://github.com/RennfahrerU/Algoritmos-de-Encriptamiento.git
+     cd Algoritmos-de-Encriptamiento
+     ```
+  
+  2. Install Pipenv:
+     ```bash
+     pip install pipenv
+     ```
+  
+  3. Install dependencies:
+     ```bash
+     pipenv install
+     ```
+</Accordion>
+
+<Accordion title="How do I run the web interface?">
+  Run the Flask application:
+  ```bash
+  pipenv run python app.py
+  ```
+  
+  Or activate the virtual environment first:
+  ```bash
+  pipenv shell
+  python app.py
+  ```
+  
+  Then open your browser to [http://localhost:5000](http://localhost:5000).
+</Accordion>
+
+<Accordion title="How do I use the console version?">
+  Run the command-line interface:
+  ```bash
+  pipenv run python main.py
+  ```
+  
+  The program will prompt you for a message and then demonstrate encryption and decryption using all three algorithms.
+</Accordion>
+
+## Algorithm questions
+
+<Accordion title="What is the Caesar cipher?">
+  The Caesar cipher (implemented in `sustitucion.py`) is a simple substitution cipher that shifts each letter in the alphabet by a fixed number of positions. This implementation uses a default shift of 8 positions and supports the Spanish alphabet including the letter Ñ.
+  
+  For example, with a shift of 8, "HOLA" becomes "OWSI".
+</Accordion>
+
+<Accordion title="How does the Transposition cipher work?">
+  The Transposition cipher (implemented in `transposicion.py`) rearranges the letters of a message according to a numeric key. It writes the message into a matrix with a specified number of columns (default: 5), then reads the ciphertext column by column. Asterisks (*) are used for padding if needed.
+</Accordion>
+
+<Accordion title="How does the RSA implementation work?">
+  The RSA cipher (implemented in `RSA.py`) is an asymmetric encryption algorithm that uses a public-private key pair. This implementation:
+  - Generates keys automatically (default: 32 bits)
+  - Uses prime numbers for key generation
+  - Encrypts messages using the public key (e, n)
+  - Decrypts messages using the private key (d, n)
+  
+  **Important:** The 32-bit key size is extremely weak and only suitable for educational purposes.
+</Accordion>
+
+<Accordion title="Can I change the encryption parameters?">
+  Yes! You can modify:
+  - **Caesar cipher:** Change the shift value (default: 8)
+  - **Transposition cipher:** Change the number of columns/key (default: 5)
+  - **RSA:** Change the bit size for key generation (default: 32)
+  
+  Check the algorithm documentation pages for specific examples.
+</Accordion>
+
+<Accordion title="Does this support Spanish characters?">
+  Yes! The implementation includes support for the Spanish alphabet with the Ñ character. This is particularly evident in the Caesar cipher implementation which uses the 27-letter Spanish alphabet.
+</Accordion>
+
+## Usage questions
+
+<Accordion title="Can I use this to encrypt files?">
+  Currently, the project is designed to encrypt text messages only. It does not have built-in file encryption capabilities. You would need to read the file content as text and process it through the algorithms.
+</Accordion>
+
+<Accordion title="How long can my messages be?">
+  There are no strict length limits imposed by the application, but:
+  - Very long messages may be slow to process, especially with RSA
+  - The web interface is designed for moderate-length messages
+  - The console interface can handle longer texts but will display the full output
+</Accordion>
+
+<Accordion title="Can I integrate this into my own project?">
+  Yes! This project is licensed under the MIT License, which allows you to use, modify, and distribute the code. However, remember that these implementations are **not secure** for production use. Use them only for educational purposes or as learning references.
+</Accordion>
+
+## Troubleshooting
+
+<Accordion title="I get an error when running the application. What should I do?">
+  Common troubleshooting steps:
+  
+  1. Ensure you have Python 3.6 or higher installed:
+     ```bash
+     python --version
+     ```
+  
+  2. Make sure all dependencies are installed:
+     ```bash
+     pipenv install
+     ```
+  
+  3. Check if port 5000 is already in use (for web interface)
+  
+  4. Try running with the virtual environment activated:
+     ```bash
+     pipenv shell
+     python app.py
+     ```
+  
+  If problems persist, open an issue on [GitHub](https://github.com/RennfahrerU/Algoritmos-de-Encriptamiento/issues).
+</Accordion>
+
+<Accordion title="The decryption doesn't match my original message. Why?">
+  This can happen if:
+  - You used different keys for encryption and decryption
+  - The ciphertext was modified or corrupted
+  - You selected the wrong algorithm for decryption
+  - Special characters or formatting were not preserved
+  
+  Make sure to use the exact same key and algorithm for both encryption and decryption.
+</Accordion>
+
+## Contributing and support
+
+<Accordion title="How can I contribute to this project?">
+  Contributions are welcome! See the [Contributing guide](/contributing) for detailed instructions on:
+  - Forking the repository
+  - Setting up your development environment
+  - Submitting pull requests
+  - Code style guidelines
+</Accordion>
+
+<Accordion title="Where can I report bugs or request features?">
+  Please use the [GitHub Issues](https://github.com/RennfahrerU/Algoritmos-de-Encriptamiento/issues) page to:
+  - Report bugs with detailed reproduction steps
+  - Request new features or improvements
+  - Ask questions about the project
+  - Discuss ideas with the maintainers
+</Accordion>
+
+<Accordion title="Is this project actively maintained?">
+  This project displays a "No Maintenance Intended" badge, indicating it's a completed educational resource. However, contributions and bug fixes are still welcome through pull requests.
+</Accordion>

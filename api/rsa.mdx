@@ -1,0 +1,471 @@
+---
+title: RSA encryption module
+description: RSA public-key cryptography implementation for secure message encryption and decryption
+---
+
+The `RSA` module implements the RSA (Rivest-Shamir-Adleman) encryption algorithm, a public-key cryptosystem used for secure data transmission.
+
+## gen_keys
+
+Generates a pair of RSA keys (public and private) for encryption and decryption.
+
+```python
+def gen_keys(bits)
+```
+
+<ParamField path="bits" type="int" required>
+  The bit length for the RSA keys. Larger values provide stronger security but slower performance. Common values: 32 (testing), 512, 1024, 2048 (recommended for production).
+</ParamField>
+
+<ResponseField name="return" type="tuple[int, int, int]">
+  A tuple containing:
+  - `e` (int): The public exponent (encryption key)
+  - `d` (int): The private exponent (decryption key)
+  - `n` (int): The modulus used by both keys
+</ResponseField>
+
+<Note>
+  Key generation involves finding two prime numbers and calculating related values. The function validates the keys by performing a test encryption/decryption cycle before returning them.
+</Note>
+
+### Example
+
+```python
+import RSA
+
+# Generate RSA keys
+bits = 32  # Use 1024 or 2048 for production
+e, d, n = RSA.gen_keys(bits)
+
+print(f"Public key (e, n): ({e}, {n})")
+print(f"Private key (d, n): ({d}, {n})")
+```
+
+### From application code
+
+```python
+import RSA
+
+# Generate keys for encryption
+bits = 32
+e, d, n = RSA.gen_keys(bits)
+
+# Store keys securely
+public_key = (e, n)
+private_key = (d, n)
+```
+
+## encrypt
+
+Encrypts a text message using RSA public key encryption.
+
+```python
+def encrypt(msg, e, n)
+```
+
+<ParamField path="msg" type="str" required>
+  The message to encrypt. Can contain any characters.
+</ParamField>
+
+<ParamField path="e" type="int" required>
+  The public exponent from the key pair.
+</ParamField>
+
+<ParamField path="n" type="int" required>
+  The modulus from the key pair.
+</ParamField>
+
+<ResponseField name="return" type="list[int]">
+  A list of encrypted integers, where each integer represents an encrypted character from the original message.
+</ResponseField>
+
+### How it works
+
+The encryption process:
+1. Converts each character to its ASCII value using `ord()`
+2. Encrypts each ASCII value using modular exponentiation: `ciphertext = (plaintext^e) mod n`
+3. Returns a list of encrypted values
+
+### Example
+
+<CodeGroup>
+
+```python Basic encryption
+import RSA
+
+# Generate keys
+bits = 32
+e, d, n = RSA.gen_keys(bits)
+
+# Encrypt a message
+mensaje = "HOLA"
+mensaje_cifrado = RSA.encrypt(mensaje, e, n)
+
+print(f"Encrypted: {mensaje_cifrado}")
+# Output: [123456, 789012, 345678, 901234] (example values)
+```
+
+```python From Flask app
+import RSA
+from flask import session
+
+def RSA_cifrar(mensaje):
+    bits = 32
+    e, d, n = RSA.gen_keys(bits)
+    
+    # Store keys in session
+    session['rsa_e'] = e
+    session['rsa_d'] = d
+    session['rsa_n'] = n
+    
+    mensaje_cifrado = RSA.encrypt(mensaje, e, n)
+    return str(mensaje_cifrado)
+```
+
+</CodeGroup>
+
+## decrypt
+
+Decrypts an RSA-encrypted message using the private key.
+
+```python
+def decrypt(cipher, d, n)
+```
+
+<ParamField path="cipher" type="list[int]" required>
+  A list of encrypted integers (typically from the `encrypt` function).
+</ParamField>
+
+<ParamField path="d" type="int" required>
+  The private exponent from the key pair.
+</ParamField>
+
+<ParamField path="n" type="int" required>
+  The modulus from the key pair (must match the one used for encryption).
+</ParamField>
+
+<ResponseField name="return" type="str">
+  The decrypted message as a string. Only includes valid ASCII characters in the range 32-126.
+</ResponseField>
+
+<Note>
+  The function filters the decrypted characters to only include valid ASCII printable characters (32-126). This prevents garbage characters from appearing in the output.
+</Note>
+
+### How it works
+
+The decryption process:
+1. Takes each encrypted integer from the cipher list
+2. Decrypts each value using modular exponentiation: `plaintext = (ciphertext^d) mod n`
+3. Converts the decrypted value back to a character using `chr()`
+4. Filters out invalid ASCII characters
+5. Returns the reconstructed message
+
+### Example
+
+<CodeGroup>
+
+```python Basic decryption
+import RSA
+
+# Generate keys
+bits = 32
+e, d, n = RSA.gen_keys(bits)
+
+# Encrypt then decrypt
+mensaje = "HOLA"
+mensaje_cifrado = RSA.encrypt(mensaje, e, n)
+mensaje_descifrado = RSA.decrypt(mensaje_cifrado, d, n)
+
+print(f"Original: {mensaje}")
+print(f"Decrypted: {mensaje_descifrado}")
+```
+
+```python From Flask app
+import RSA
+import ast
+from flask import session
+
+def RSA_descifrar(mensaje_cifrado_str):
+    # Get keys from session
+    d = session['rsa_d']
+    n = session['rsa_n']
+    
+    # Convert string back to list
+    mensaje_cifrado = ast.literal_eval(mensaje_cifrado_str)
+    
+    # Decrypt
+    mensaje_descifrado = RSA.decrypt(mensaje_cifrado, d, n)
+    return mensaje_descifrado
+```
+
+</CodeGroup>
+
+## encrypt_number
+
+Encrypts a single number using RSA encryption.
+
+```python
+def encrypt_number(num, e, n)
+```
+
+<ParamField path="num" type="int" required>
+  The number to encrypt.
+</ParamField>
+
+<ParamField path="e" type="int" required>
+  The public exponent from the key pair.
+</ParamField>
+
+<ParamField path="n" type="int" required>
+  The modulus from the key pair.
+</ParamField>
+
+<ResponseField name="return" type="int">
+  The encrypted number calculated as `(num^e) mod n`.
+</ResponseField>
+
+### Example
+
+```python
+import RSA
+
+# Generate keys
+e, d, n = RSA.gen_keys(32)
+
+# Encrypt a number
+num = 42
+encrypted = RSA.encrypt_number(num, e, n)
+
+print(f"Encrypted number: {encrypted}")
+```
+
+## decrypt_number
+
+Decrypts a single RSA-encrypted number.
+
+```python
+def decrypt_number(cipher, d, n)
+```
+
+<ParamField path="cipher" type="int" required>
+  The encrypted number to decrypt.
+</ParamField>
+
+<ParamField path="d" type="int" required>
+  The private exponent from the key pair.
+</ParamField>
+
+<ParamField path="n" type="int" required>
+  The modulus from the key pair.
+</ParamField>
+
+<ResponseField name="return" type="int">
+  The decrypted number calculated as `(cipher^d) mod n`.
+</ResponseField>
+
+### Example
+
+```python
+import RSA
+
+# Generate keys
+e, d, n = RSA.gen_keys(32)
+
+# Encrypt and decrypt a number
+num = 42
+encrypted = RSA.encrypt_number(num, e, n)
+decrypted = RSA.decrypt_number(encrypted, d, n)
+
+print(f"Original: {num}")
+print(f"Decrypted: {decrypted}")  # Should match original
+```
+
+## gcd
+
+Calculates the greatest common divisor (GCD) of two numbers using the Euclidean algorithm.
+
+```python
+def gcd(a, b)
+```
+
+<ParamField path="a" type="int" required>
+  The first number.
+</ParamField>
+
+<ParamField path="b" type="int" required>
+  The second number.
+</ParamField>
+
+<ResponseField name="return" type="int">
+  The greatest common divisor of a and b.
+</ResponseField>
+
+<Note>
+  This function is used internally during key generation to ensure that the public exponent `e` is coprime with `phi(n)`.
+</Note>
+
+### Example
+
+```python
+import RSA
+
+result = RSA.gcd(48, 18)
+print(result)  # Output: 6
+```
+
+## mod_inverse
+
+Calculates the modular multiplicative inverse using the Extended Euclidean algorithm.
+
+```python
+def mod_inverse(a, m)
+```
+
+<ParamField path="a" type="int" required>
+  The number to find the inverse of.
+</ParamField>
+
+<ParamField path="m" type="int" required>
+  The modulus.
+</ParamField>
+
+<ResponseField name="return" type="int">
+  The modular multiplicative inverse of `a` modulo `m`, such that `(a * result) mod m = 1`.
+</ResponseField>
+
+<Note>
+  This function is used internally to calculate the private key exponent `d` from the public exponent `e` and `phi(n)`.
+</Note>
+
+### Example
+
+```python
+import RSA
+
+# Find inverse of 3 modulo 11
+inverse = RSA.mod_inverse(3, 11)
+print(inverse)  # Output: 4 (because 3 * 4 mod 11 = 1)
+```
+
+## gen_prime
+
+Generates a random prime number of the specified bit length.
+
+```python
+def gen_prime(bits)
+```
+
+<ParamField path="bits" type="int" required>
+  The bit length of the prime number to generate.
+</ParamField>
+
+<ResponseField name="return" type="int">
+  A random prime number with the specified bit length.
+</ResponseField>
+
+### Example
+
+```python
+import RSA
+
+# Generate a 16-bit prime number
+prime = RSA.gen_prime(16)
+print(f"Generated prime: {prime}")
+print(f"Is prime: {RSA.is_prime(prime)}")
+```
+
+## is_prime
+
+Checks whether a number is prime using trial division.
+
+```python
+def is_prime(n)
+```
+
+<ParamField path="n" type="int" required>
+  The number to check for primality.
+</ParamField>
+
+<ResponseField name="return" type="bool">
+  `True` if the number is prime, `False` otherwise.
+</ResponseField>
+
+<Note>
+  This implementation uses a simple trial division method. For larger numbers, more sophisticated primality tests (like Miller-Rabin) would be more efficient.
+</Note>
+
+### Example
+
+```python
+import RSA
+
+print(RSA.is_prime(17))  # True
+print(RSA.is_prime(18))  # False
+print(RSA.is_prime(97))  # True
+```
+
+## Complete RSA workflow
+
+Here's a complete example showing the full RSA encryption/decryption process:
+
+<CodeGroup>
+
+```python Complete workflow
+import RSA
+
+# Step 1: Generate keys
+print("Generating RSA keys...")
+bits = 32
+e, d, n = RSA.gen_keys(bits)
+
+print(f"Public key (e, n): ({e}, {n})")
+print(f"Private key (d, n): ({d}, {n})")
+
+# Step 2: Encrypt a message
+mensaje = "Hello, World!"
+print(f"\nOriginal message: {mensaje}")
+
+mensaje_cifrado = RSA.encrypt(mensaje, e, n)
+print(f"Encrypted: {mensaje_cifrado}")
+
+# Step 3: Decrypt the message
+mensaje_descifrado = RSA.decrypt(mensaje_cifrado, d, n)
+print(f"Decrypted: {mensaje_descifrado}")
+```
+
+```python From main.py
+import RSA
+
+def RSA_cifrar(mensaje, e, n):
+    mensaje_cifrado = RSA.encrypt(mensaje, e, n)
+    print(f"Mensaje cifrado: {mensaje_cifrado}")
+    return mensaje_cifrado
+
+def RSA_descifrar(mensaje_cifrado, d, n):
+    mensaje_descifrado = RSA.decrypt(mensaje_cifrado, d, n)
+    if mensaje_descifrado is not None:
+        print(f"Mensaje descifrado: {mensaje_descifrado}")
+    else:
+        print("Error al descifrar el mensaje.")
+
+# Usage
+bits = 32
+e, d, n = RSA.gen_keys(bits)
+mensaje = "HOLA MUNDO"
+mensaje_cifrado = RSA_cifrar(mensaje, e, n)
+RSA_descifrar(mensaje_cifrado, d, n)
+```
+
+</CodeGroup>
+
+## Security considerations
+
+<Note>
+  **Important security notes:**
+  - Use at least 2048 bits for production systems
+  - Keep private keys (`d`) secure and never share them
+  - Public keys (`e`, `n`) can be shared freely
+  - The same key pair can encrypt multiple messages
+  - For the educational implementation, 32-bit keys are used for speed but are NOT secure
+</Note>

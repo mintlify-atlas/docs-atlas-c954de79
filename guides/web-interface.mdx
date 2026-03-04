@@ -1,0 +1,211 @@
+---
+title: Using the web interface
+description: Learn how to encrypt and decrypt messages using the Flask web application
+---
+
+The web interface provides an intuitive way to encrypt and decrypt messages using all three supported algorithms. This guide will walk you through using the Flask application.
+
+## Starting the web server
+
+<Steps>
+  <Step title="Activate the environment">
+    First, activate the Pipenv virtual environment:
+    
+    ```bash
+    pipenv shell
+    ```
+  </Step>
+  
+  <Step title="Launch the Flask application">
+    Start the web server:
+    
+    ```bash
+    python app.py
+    ```
+    
+    The application will start on `http://localhost:5000` by default.
+  </Step>
+  
+  <Step title="Open in browser">
+    Navigate to `http://localhost:5000` in your web browser to access the interface.
+  </Step>
+</Steps>
+
+## Interface overview
+
+The web interface consists of a single-page application with the following elements:
+
+- **Message input**: A textarea where you enter the text to encrypt or decrypt
+- **Operation selector**: Choose between "Cifrar" (Encrypt) or "Descifrar" (Decrypt)
+- **Algorithm selector**: Select from Sustitución (César), Transposición, or RSA
+- **Process button**: Submit the form to perform the operation
+- **Result display**: Shows the encrypted/decrypted output
+- **Additional info**: For RSA, displays generated keys and instructions
+
+## Using different algorithms
+
+<Tabs>
+  <Tab title="Sustitución (César)">
+    The Caesar cipher shifts letters by a fixed position (default: 8 positions).
+    
+    ### Encrypting a message
+    
+    1. Enter your plaintext message in the "Mensaje" field
+    2. Select "🔒 Cifrar" from the Operation dropdown
+    3. Select "🔄 Sustitución (César)" from the Type dropdown
+    4. Click "Procesar ✨"
+    
+    **Example:**
+    - Input: `HOLA MUNDO`
+    - Output: `OWSITCULW`
+    
+    ### Decrypting a message
+    
+    1. Enter the encrypted text in the "Mensaje" field
+    2. Select "🔓 Descifrar" from the Operation dropdown
+    3. Select "🔄 Sustitución (César)" from the Type dropdown
+    4. Click "Procesar ✨"
+    
+    **Example:**
+    - Input: `OWSITCULW`
+    - Output: `HOLAMUNDO`
+    
+    <Note>
+      The shift position is fixed at 8 in the web interface. Spaces are removed from the output.
+    </Note>
+  </Tab>
+  
+  <Tab title="Transposición">
+    The transposition cipher rearranges letters in a matrix based on a key (default: 5 columns).
+    
+    ### Encrypting a message
+    
+    1. Enter your plaintext message in the "Mensaje" field
+    2. Select "🔒 Cifrar" from the Operation dropdown
+    3. Select "🔀 Transposición" from the Type dropdown
+    4. Click "Procesar ✨"
+    
+    **Example:**
+    - Input: `HOLA MUNDO`
+    - Output: `HUONLDAOM*`
+    
+    <Info>
+      The `*` character is used as padding when the message length doesn't perfectly fit the matrix.
+    </Info>
+    
+    ### Decrypting a message
+    
+    1. Enter the encrypted text (including any `*` padding) in the "Mensaje" field
+    2. Select "🔓 Descifrar" from the Operation dropdown
+    3. Select "🔀 Transposición" from the Type dropdown
+    4. Click "Procesar ✨"
+    
+    **Example:**
+    - Input: `HUONLDAOM*`
+    - Output: `HOLAMUNDO`
+  </Tab>
+  
+  <Tab title="RSA">
+    RSA is an asymmetric encryption algorithm that generates public and private keys automatically.
+    
+    ### Encrypting a message
+    
+    1. Enter your plaintext message in the "Mensaje" field
+    2. Select "🔒 Cifrar" from the Operation dropdown
+    3. Select "🔑 RSA" from the Type dropdown
+    4. Click "Procesar ✨"
+    
+    The interface will display:
+    - The encrypted message as a list of numbers: `[210781516, 270112935, ...]`
+    - An information box showing the generated keys (e, d, n)
+    
+    **Example output:**
+    ```
+    Resultado:
+    [123456789, 987654321, 456789123]
+    
+    Información Adicional:
+    Claves generadas - e: 65537, d: 123456789, n: 987654321.
+    Para descifrar, usa esta lista exacta: [123456789, 987654321, 456789123]
+    ```
+    
+    <Note>
+      RSA keys are stored in the session. Keep your browser tab open to decrypt messages with the same keys.
+    </Note>
+    
+    ### Decrypting a message
+    
+    <Steps>
+      <Step title="Ensure keys are in session">
+        You must first encrypt a message to generate keys. The keys are automatically stored in your browser session.
+      </Step>
+      
+      <Step title="Copy the encrypted list">
+        Copy the entire list of numbers from the encryption result, including the square brackets.
+      </Step>
+      
+      <Step title="Paste and decrypt">
+        1. Paste the list into the "Mensaje" field: `[123456789, 987654321, 456789123]`
+        2. Select "🔓 Descifrar" from the Operation dropdown
+        3. Select "🔑 RSA" from the Type dropdown
+        4. Click "Procesar ✨"
+      </Step>
+    </Steps>
+    
+    **Example:**
+    - Input: `[210781516, 270112935, 1336237868]`
+    - Output: `HOLA MUNDO`
+    
+    <Info>
+      If you close your browser or clear the session, you'll need to encrypt a new message to generate fresh keys.
+    </Info>
+  </Tab>
+</Tabs>
+
+## Understanding the workflow
+
+The web application uses Flask sessions to manage RSA keys and processes requests through the following flow:
+
+```python
+app.py:10-38
+```
+
+1. **Form submission**: User submits message, operation, and algorithm type
+2. **Algorithm routing**: Based on `tipo_cifrado`, the appropriate function is called
+3. **Session management**: For RSA, keys are stored in Flask session
+4. **Result rendering**: Output is displayed in the result container
+
+## Common issues and solutions
+
+<AccordionGroup>
+  <Accordion title="RSA decryption error: No hay claves RSA en la sesión">
+    **Problem**: You're trying to decrypt without first encrypting a message.
+    
+    **Solution**: Encrypt a message first to generate keys, then copy the encrypted list to decrypt.
+  </Accordion>
+  
+  <Accordion title="RSA decryption error: El formato del mensaje cifrado no es válido">
+    **Problem**: The encrypted message wasn't pasted in the correct format.
+    
+    **Solution**: Ensure you're pasting the complete list with brackets: `[123, 456, 789]`
+  </Accordion>
+  
+  <Accordion title="Unexpected characters in output">
+    **Problem**: The algorithms may add padding (`*`) or remove spaces.
+    
+    **Solution**: This is expected behavior. Spaces are removed in substitution cipher, and `*` is used for padding in transposition.
+  </Accordion>
+</AccordionGroup>
+
+## Technical details
+
+The web interface is implemented in `app.py` with the following key features:
+
+- **Secret key**: Uses Flask sessions with a secret key (line 8)
+- **Fixed parameters**: Substitution uses shift=8, Transposition uses key=5
+- **RSA key size**: Generates 32-bit keys (suitable for educational purposes only)
+- **Session storage**: RSA keys (e, d, n) are stored in Flask session for reuse
+
+<Warning>
+  This implementation is for educational purposes only. The 32-bit RSA keys and simple Caesar/transposition ciphers are not secure for real-world use.
+</Warning>
